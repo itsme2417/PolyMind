@@ -28,6 +28,4 @@ config = Config()
 API_ENDPOINT_URI = f"http://{config.host}:{config.port}/"
 API_KEY = config.api_key 
 
-TABBY = False
-if config.backend == "tabbyapi":
-    TABBY = True
+TABBY = True if config.backend == "tabbyapi" else False
