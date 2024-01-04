@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PolyMind Chat</title>
+    <div id="splash-screen" class="splash-container">
+        <div class="square-container">
+          <svg class="splash-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="0,100 100,100 50,0" />
+          </svg>
+          <div class="splash-text">
+            <h1>PolyMind Chat</h1>
+            <p>Welcome to PolyMind Chat!</p>
+          </div>
+        </div>
+      </div>
+      
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <style>
+        .splash-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #1E2021;
+        z-index: 999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: fadeOut 2s forwards;
+        }
+
+        .square-container {
+        display: flex;
+        flex-direction: column;
+        }
+
+        .splash-logo {
+        width: 100px;
+        height: 100px;
+        fill: #007bff;
+        stroke: none;
+        stroke-width: 0;
+        animation: squareToTriangle 2s forwards;
+        }
+
+        .splash-text {
+        margin-top: 20px;
+        }
+
+        .splash-text h1 {
+        font-size: 2rem;
+        font-weight: bold;
+        }
+
+        .splash-text p {
+        font-size: 1.2rem;
+        }
+        @keyframes squareToTriangle {
+        0% {
+            points: 0,100 100,100 50,0;
+        }
+        50% {
+            points: 0,100 100,0 50,100;
+        }
+        100% {
+            points: 0,0 100,0 50,100;
+        }
+        }
+
+
+        @keyframes fadeOut {
+        0% {
+            opacity: 1;
+            visibility: visible;
+        }
+        100% {
+            opacity: 0;
+            visibility: hidden;
+        }
+        }
+
+        .chat-container {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f5f5f5;
+        }
+        .output-container {
+            overflow-y: auto;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .user-input {
+            background-color: #e0e0e0;
+            margin-left: 30px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .assistant-output {
+            background-color: #bde0c8;
+            margin-right: 30px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+        }
+        .loading-spinner {
+            display: none;
+            margin-left: 10px;
+        }
+
+        .spinner-border {
+            width: 2rem;
+            height: 2rem;
+            border: 0.25em solid rgba(0, 0, 0, 0.125);
+            border-left-color: #007bff;
+            border-radius: 50%;
+            animation: rotate 1s linear infinite;
+        }
+
+        @keyframes rotate {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+        }
+
+        .button-spacing {
+            margin-right: 5px;
+        }
+        /* Custom CSS for code blocks */
+        code {
+            padding: 5px;
+            border-radius: 5px;
+            background-color: #f5f5f5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            word-break: normal;
+        }
+        pre {
+            margin: 0;
+            padding: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            word-break: normal;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+</head>
+<body>
+    <div class="container-fluid chat-container">
+        <div class="row">
+            <div class="col-12">
+                <div class="output-container" id="output">
+                    <!-- Chat output will be inserted here -->
+                </div>
+            </div>
+            <div class="col-12">
+                <form method="post">
+                    <div class="input-group">
+                        <input type="text" name="input" class="form-control" placeholder="Type your message here..." autocomplete="off">
+                        <button type="submit" class="btn btn-primary button-spacing">Send</button>
+                        <button type="button" class="btn btn-secondary button-spacing" id="upload-image-button">Image</button>
+                        <div class="loading-spinner spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                          </div>
+                          
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+    <script>
+        const outputDiv = document.getElementById('output');
+        const markdownParser = marked.setOptions({
+            breaks: true,
+            pedantic: true,
+            gfm: true,
+            smartLists: true,
+            smartypants: true,
+            highlight: function (code) {
+                return hljs.highlightAuto(code).value;
+            }
+        });
+
+
+
+        function appendOutput(message, isUserInput) {
+            let parsedMessage = message
+            const p = document.createElement('p');
+            if (!isUserInput) {
+                parsedMessage = markdownParser(parsedMessage);
+                p.innerHTML = parsedMessage;
+                p.className = 'assistant-output';
+            } else {
+                p.textContent = parsedMessage;
+                p.className = 'user-input';
+            }
+            outputDiv.appendChild(p);
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+        }
+
+        window.onload = function() {
+            fetch('/chat_history')
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(chatItem => {
+                            appendOutput(chatItem['user'], true); // Display user input messages
+                            appendOutput(chatItem['assistant'], false); // Display assistant response messages
+
+                    });
+                    adjustOutputContainerHeight();
+                });
+        }
+
+        // Send user input and display the response
+        const form = document.querySelector('form');
+        const loadingSpinner = document.querySelector('.loading-spinner');
+        const uploadImageButton = document.querySelector('#upload-image-button');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const userInput = document.querySelector('input[name="input"]').value;
+            const messages = userInput.split('\n').filter(message => message.trim() !== '');
+            messages.forEach((message, index) => {
+                appendOutput(message, true); // Display user input messages
+                if (index !== messages.length - 1) {
+                    outputDiv.appendChild(document.createTextNode('--newline--'));
+                }
+            });
+            loadingSpinner.style.display = 'block'; // Show loading spinner
+            fetch('/', {
+                method: 'POST',
+                body: new URLSearchParams({ 'input': userInput }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.output.trim() !== '') {
+                    data.output.split('--newline--').forEach(message => {
+                        message = markdownParser(message);
+                        appendOutput(message, false); // Display assistant response messages
+                    });
+                    document.querySelector('input[name="input"]').value = '';
+                }
+                loadingSpinner.style.display = 'none'; // Hide loading spinner
+                outputDiv.scrollTop = outputDiv.scrollHeight;
+                adjustOutputContainerHeight();
+
+                if (data.base64_image) {
+                    const base64Image = `${data.base64_image}`;
+                    const imageElement = document.createElement('img');
+                    imageElement.src = base64Image;
+                    imageElement.alt = 'Uploaded image';
+                    imageElement.className = 'uploaded-image';
+                    imageElement.style.border = '1px solid black';
+                    imageElement.style.padding = '5px';
+                    outputDiv.appendChild(imageElement);
+                    outputDiv.scrollTop = outputDiv.scrollHeight;
+                }
+            });
+        });
+
+        uploadImageButton.addEventListener('click', function() {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '*';
+
+            fileInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const fileContent = event.target.result;
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        formData.append('content', fileContent);
+                        fetch('/upload_file', {
+                            method: 'POST',
+                            body: formData,
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.base64_image) {
+                                const base64Image = `${data.base64_image}`;
+                                const imageElement = document.createElement('img');
+                                imageElement.src = base64Image;
+                                imageElement.alt = 'Uploaded image';
+                                imageElement.className = 'uploaded-image';
+                                imageElement.style.border = '1px solid black';
+                                imageElement.style.padding = '5px';
+                                outputDiv.appendChild(imageElement);
+                                outputDiv.scrollTop = outputDiv.scrollHeight;
+                            } else {
+                                appendOutput(data.message, true);
+                            }
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            fileInput.click();
+        });
+
+        function adjustOutputContainerHeight() {
+            const messages = document.querySelectorAll('.assistant-output, .user-input');
+            const messagesCount = messages.length;
+            const messageHeight = 50; // Approximate height of a single message
+            const newHeight = Math.max(messagesCount * messageHeight, 800); // Set a minimum height of 800 pixels
+            outputDiv.style.height = `${newHeight}px`;
+        }
+    </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</body>
+</html>
