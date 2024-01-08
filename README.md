@@ -46,3 +46,7 @@ XMR: 46nkUDLzVDrBWUWQE2ujkQVCbWUPGR9rbSc6wYvLbpYbVvWMxSjWymhS8maYdZYk8mh25sJ2c7S
 
 If you want to mess around with my llm discord bot or join for whatever reason, heres a discord server:
 https://discord.gg/zxPCKn859r
+
+## Screenshots
+![screenshot0](/images/screenshot0.png)
+![screenshot1](/images/screenshot1.png)
