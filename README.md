@@ -1,6 +1,6 @@
 # PolyMind
 
-PolyMind is a multimodal, function calling powered LLM webui. It's designed to be used with Mixtral 8x7B and offers a wide range of features including:
+PolyMind is a multimodal, function calling powered LLM webui. It's designed to be used with Mixtral 8x7B + TabbyAPI and offers a wide range of features including:
 
 - Internet searching with DuckDuckGo and web scraping capabilities.
 - Image generation using comfyui.
