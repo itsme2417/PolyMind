@@ -1,0 +1,45 @@
+[    {
+        "name": "acknowledge",
+        "description": "This function should always be used if no other function is required / wouldnt be useful for the input and the user is just talking to the assistant.",
+        "params": {
+            "message": "an optional message from GateKeeper, it should not exceed 5 words."
+        }
+    },
+    {
+        "name": "internetsearch",
+        "description": "This uses a search engine to research the topic. Only use when neccessary.",
+        "params": {
+            "keywords": "A comma separated list of keywords to be passed to the search engine."
+        }
+    },
+    {
+        "name": "portscan",
+        "description": "This scans an IP for open ports and similar information. Also useful to see if a host is down/up.",
+        "params": {
+            "ip": "IP to scan"
+        }
+    },    
+    {
+        "name": "runpythoncode",
+        "description": "This runs python code. Use sparingly. Only execute code when asked to directly by the user or when absolutely neccessary to solve things like complex math.",
+        "params": {
+            "code": "The python code to run."
+        }
+    },    
+    {
+        "name": "clearmemory",
+        "description": "This clears the conversation and memory.",
+        "params": {
+            "message": "an optional concise message from GateKeeper reminding the user to reload the page."
+
+       }
+     },
+     {
+        "name": "generateimage",
+        "description": "This uses stable diffusion to generate a requested image. As polymind is able to view images, do not mistake a request about a sent image as being a request for this.",
+        "params": {
+            "prompt": "The prompt for stable diffusion to generate the image from."
+
+       }
+     }
+]

@@ -1,0 +1,113 @@
+{
+    "3": {
+      "inputs": {
+        "seed": 167055194337639,
+        "steps": 5,
+        "cfg": 1.8,
+        "sampler_name": "lcm",
+        "scheduler": "sgm_uniform",
+        "denoise": 1,
+        "model": [
+          "11",
+          0
+        ],
+        "positive": [
+          "6",
+          0
+        ],
+        "negative": [
+          "7",
+          0
+        ],
+        "latent_image": [
+          "5",
+          0
+        ]
+      },
+      "class_type": "KSampler"
+    },
+    "4": {
+      "inputs": {
+        "ckpt_name": "dreamshaperxlalpha2.safetensors"
+      },
+      "class_type": "CheckpointLoaderSimple"
+    },
+    "5": {
+      "inputs": {
+        "width": 1024,
+        "height": 1024,
+        "batch_size": 1
+      },
+      "class_type": "EmptyLatentImage"
+    },
+    "6": {
+      "inputs": {
+        "text": "",
+        "clip": [
+          "10",
+          1
+        ]
+      },
+      "class_type": "CLIPTextEncode"
+    },
+    "7": {
+      "inputs": {
+        "text": "watermark, ((blurry)), duplicate, deformed, render, missing limbs, close-up, lowres, low-quality, worst quality, extra (limbs)",
+        "clip": [
+          "10",
+          1
+        ]
+      },
+      "class_type": "CLIPTextEncode"
+    },
+    "8": {
+      "inputs": {
+        "samples": [
+          "3",
+          0
+        ],
+        "vae": [
+          "4",
+          2
+        ]
+      },
+      "class_type": "VAEDecode"
+    },
+    "9": {
+      "inputs": {
+        "filename_prefix": "ComfyUI",
+        "images": [
+          "8",
+          0
+        ]
+      },
+      "class_type": "SaveImage"
+    },
+    "10": {
+      "inputs": {
+        "lora_name": "pytorch_lora_weights.safetensors",
+        "strength_model": 1,
+        "strength_clip": 1,
+        "model": [
+          "4",
+          0
+        ],
+        "clip": [
+          "4",
+          1
+        ]
+      },
+      "class_type": "LoraLoader"
+    },
+    "11": {
+      "inputs": {
+        "sampling": "lcm",
+        "zsnr": false,
+        "model": [
+          "10",
+          0
+        ]
+      },
+      "class_type": "ModelSamplingDiscrete"
+    }
+  }
