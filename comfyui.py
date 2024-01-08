@@ -7,6 +7,7 @@ import uuid
 import os
 import websocket
 import re
+import traceback
 from openai import OpenAI
 import Shared_vars
 
