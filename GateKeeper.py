@@ -10,7 +10,6 @@ import subprocess
 import Shared_vars
 from comfyui import imagegen
 from inference import infer
-import traceback
 from scrape import scrape_site
 
 path = os.path.realpath(__file__).strip("GateKeeper.py")
@@ -112,7 +111,7 @@ def GateKeep(input, ip):
         )
         print(content)
         return Util(json.loads(content.replace("Output:", "")), ip)
-    except Exception as e:
+    except Exception:
         return "null"
 
 

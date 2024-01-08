@@ -36,3 +36,13 @@ The application's configuration is stored in `config.json` file. Here's a descri
 - `LLM_parameters`: Should be self explanatory, parameters will be overriden by known working ones for now.
 - `Enabled_features, image_input, image_generation`: URIs for llama.cpp running a multimodal model and comfyui respectively.
 
+## Donations
+
+Patreon: https://www.patreon.com/llama990
+
+LTC: Le23XWF6bh4ZAzMRK8C9bXcEzjn5xdfVgP
+
+XMR: 46nkUDLzVDrBWUWQE2ujkQVCbWUPGR9rbSc6wYvLbpYbVvWMxSjWymhS8maYdZYk8mh25sJ2c7S93VshGAij3YJhPztvbTb
+
+If you want to mess around with my llm discord bot or join for whatever reason, heres a discord server:
+https://discord.gg/zxPCKn859r
