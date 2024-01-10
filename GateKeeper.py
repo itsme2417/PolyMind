@@ -137,8 +137,12 @@ def Util(rsp, ip):
         return "skipment{<" + params["message"]
     
     elif rsp["function"] == "wolframalpha":
+        
         res = client.query(params["query"])
-        return "Wolfram Alpha result: " + next(res.results).text
+        results = ''
+        for x in res.results:
+            results += x.text + '\n'
+        return "Wolfram Alpha result: " + results
 
 
     elif rsp["function"] == "generateimage":
