@@ -14,6 +14,7 @@ The web parts (HTML, JS, CSS, and Flask) are written entirely by Mixtral.
 ## Installation
 1. Clone the repository: `git clone https://github.com/yourusername/polymind.git`
 2. Install the required dependencies: `pip install -r requirements.txt`
+3. Copy `config.example.json` as `config.json` and fill in required settings.
 
 ## Usage
 
