@@ -4,6 +4,7 @@ import json
 import re
 import html
 import time
+import wolframalpha
 from duckduckgo_search import DDGS
 import nmap
 import subprocess
@@ -18,6 +19,7 @@ client = OpenAI(
     api_key=Shared_vars.config.api_key,
 )
 func = ""
+client = wolframalpha.Client(Shared_vars.config.enabled_features["wolframalpha"]['app_id'])
 
 with open(path + "functions.json") as user_file:
     fcontent = json.loads(user_file.read())
@@ -124,22 +126,29 @@ def Util(rsp, ip):
         .replace("{<", "{")
         .replace("<startfunc>", "")
     )
+    params = rsp["params"] if "params" in rsp else rsp
+
     if rsp["function"] == "acknowledge":
         return "null"
 
     elif rsp["function"] == "clearmemory":
         Shared_vars.mem[f"{ip}"] = []
         Shared_vars.vismem[f"{ip}"] = []
-        return "skipment{<" + rsp["params"]["message"]
+        return "skipment{<" + params["message"]
+    
+    elif rsp["function"] == "wolframalpha":
+        res = client.query(params["query"])
+        return "Wolfram Alpha result: " + next(res.results).text
+
 
     elif rsp["function"] == "generateimage":
-        return imagegen(rsp["params"]["prompt"])
+        return imagegen(params["prompt"])
     elif rsp["function"] == "runpythoncode":
         if ip != Shared_vars.config.adminip:
             return "null"
         time.sleep(5)
         output = subprocess.run(
-            ["python3", "-c", rsp["params"]["code"]],
+            ["python3", "-c", params["code"]],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
@@ -150,7 +159,7 @@ def Util(rsp, ip):
     elif rsp["function"] == "internetsearch":
         with DDGS() as ddgs:
             for r in ddgs.text(
-                rsp["params"]["keywords"], safesearch="Off", max_results=4
+                params["keywords"], safesearch="Off", max_results=4
             ):
                 title = r["title"]
                 link = r["href"]
@@ -162,9 +171,9 @@ def Util(rsp, ip):
             return "null"
         nm = nmap.PortScanner()
         try:
-            nm.scan(rsp["params"]["ip"])
-            if nm[rsp["params"]["ip"]].state() == "up":
-                for x in nm[rsp["params"]["ip"]]["tcp"].keys():
+            nm.scan(params["ip"])
+            if nm[params["ip"]].state() == "up":
+                for x in nm[params["ip"]]["tcp"].keys():
                     result += f"{nm[rsp['params']['ip']]['tcp'][x]['name']}: State {nm[rsp['params']['ip']]['tcp'][x]['state']} ({x})\n"
                 return f"<Portscan output for IP {rsp['params']['ip']}>: " + result
         except:

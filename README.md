@@ -6,6 +6,7 @@ PolyMind is a multimodal, function calling powered LLM webui. It's designed to b
 - Image generation using comfyui.
 - Image input with sharegpt4v (Over llama.cpp's server), OCR, and Yolo.
 - Port scanning with nmap.
+- Basic Wolfram Alpha integration.
 - A Python interpreter.
 
 The web parts (HTML, JS, CSS, and Flask) are written entirely by Mixtral.
@@ -34,7 +35,7 @@ The application's configuration is stored in `config.json` file. Here's a descri
 - `max_seq_len`: The maximum context length.
 - `reserve_space`: Reserves an amount of tokens equivalent to max_new_tokens in the context if set to true.
 - `LLM_parameters`: Should be self explanatory, parameters will be overriden by known working ones for now.
-- `Enabled_features, image_input, image_generation`: URIs for llama.cpp running a multimodal model and comfyui respectively.
+- `Enabled_features, image_input, image_generation`, `wolframalpha`: URIs for llama.cpp running a multimodal model, comfyui and the app_id for wolfram alpha respectively.
 
 ## Donations
 
@@ -50,3 +51,4 @@ https://discord.gg/zxPCKn859r
 ## Screenshots
 ![screenshot0](/images/screenshot0.png)
 ![screenshot1](/images/screenshot1.png)
+![screenshot2](/images/screenshot2.png)

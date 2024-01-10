@@ -20,6 +20,13 @@
         }
     },    
     {
+        "name": "wolframalpha",
+        "description": "This uses wolfram alpha to solve the query and returns the result.",
+        "params": {
+            "query": "Wolfram alpha query"
+        }
+    },    
+    {
         "name": "runpythoncode",
         "description": "This runs python code. Use sparingly. Only execute code when asked to directly by the user or when absolutely neccessary to solve things like complex math.",
         "params": {

@@ -24,6 +24,9 @@
         },
         "image_generation": {
             "server_address": "127.0.0.1:8188"
+        },
+        "wolframalpha": {
+            "app_id": "your-wolframalpha-app-id"
         }
     }
   }
