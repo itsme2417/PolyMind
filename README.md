@@ -52,3 +52,4 @@ https://discord.gg/zxPCKn859r
 ![screenshot0](/images/screenshot0.png)
 ![screenshot1](/images/screenshot1.png)
 ![screenshot2](/images/screenshot2.png)
+![screenshot3](/images/screenshot3.png)
