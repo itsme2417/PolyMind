@@ -7,6 +7,7 @@ import time
 import wolframalpha
 from duckduckgo_search import DDGS
 import nmap
+from datetime import datetime
 import subprocess
 import Shared_vars
 from comfyui import imagegen
@@ -50,7 +51,7 @@ def GateKeep(input, ip):
             "Input: " + input,
             mem=[],
             modelname="Output:",
-            system=f"You are an AI assistant named GateKeeper, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{func}\nContext: {ctxstr}\n",
+            system=f"You are an AI assistant named GateKeeper, The current date is {datetime.now()}, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{func}\nContext: {ctxstr}\n",
             temperature=0.1,
             top_p=0.1,
             min_p=0.05,
@@ -77,7 +78,7 @@ def GateKeep(input, ip):
             "Input: " + input,
             mem=[],
             modelname="Output:",
-            system=f"You are an AI assistant named GateKeeper, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{func}",
+            system=f"You are an AI assistant named GateKeeper, The current date is {datetime.now()}, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{func}",
             temperature=0.1,
             top_p=0.1,
             min_p=0.05,
