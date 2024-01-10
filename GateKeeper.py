@@ -45,7 +45,7 @@ def GateKeep(input, ip):
     try:
         ctxstr = ""
         for x in Shared_vars.vismem[f"{ip}"][-2:]:
-            ctxstr += "USER: " + x["user"] + "\n" + "PolyMind: " + x["assistant"]
+            ctxstr += re.sub( r'!\[.*?\]\(.*?\)|<img.*?>', '', "USER: " + x["user"] + "\n" + "PolyMind: " + x["assistant"])
         content = infer(
             "Input: " + input,
             mem=[],
@@ -140,9 +140,18 @@ def Util(rsp, ip):
         
         res = client.query(params["query"])
         results = ''
-        for x in res.results:
-            results += x.text + '\n'
-        return "Wolfram Alpha result: " + results
+        checkimage = False
+        for pod in res.pods:
+            for sub in pod.subpods:
+                if "plot" in sub.img["@alt"].lower() and not "plot |" in sub.img["@alt"].lower():
+                    results += f'<img src="{sub.img["@src"]}" alt="{sub.img["@alt"]}"/>' + '\n'
+                    checkimage = True
+                elif sub.plaintext:
+                        results += sub.plaintext + '\n'
+        result = "Wolfram Alpha result: " + results
+        if checkimage:
+            result += '\nREMINDER: include the graph images in your explanation if theres any when explaining the results in a short and concise manner.'
+        return result
 
 
     elif rsp["function"] == "generateimage":
