@@ -126,7 +126,10 @@ def infer(
     for line in request.iter_lines(decode_unicode=True):
         if line:
             if TABBY:
-                try:
+                if " ".join(line.split(" ")[1:]) != "[DONE]":
+                    
+                    if json.loads(" ".join(line.split(" ")[1:]))["choices"][0]["finish_reason"] != "Generated":
+                        print(line)
                     print(
                         json.loads(" ".join(line.split(" ")[1:]))["choices"][0]["text"],
                         end="",
@@ -136,8 +139,6 @@ def infer(
                     content += json.loads(" ".join(line.split(" ")[1:]))["choices"][0][
                         "text"
                     ]
-                except Exception as e:
-                    print(e)
 
             else:
                 try:
