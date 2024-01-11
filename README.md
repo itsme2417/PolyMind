@@ -25,6 +25,7 @@ To use PolyMind, run the following command in the project directory:
 ```bash
 python main.py
 ```
+There are no "commands" or similar as everything is done via function calling. Clearing the context can be done by askign the model to do so.
 
 ## Configuration
 
