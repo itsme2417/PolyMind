@@ -155,8 +155,19 @@ def Util(rsp, ip):
         Shared_vars.mem[f"{ip}"] = []
         Shared_vars.vismem[f"{ip}"] = []
         return "skipment{<" + params["message"]
-
+    
+    elif rsp["function"] == "updateconfig":
+        if ip != Shared_vars.config.adminip:
+            return "null"
+        check = False if params['option'].split(":")[1].lower() == "false" else True
+        Shared_vars.config.enabled_features[params['option'].split(":")[0]]["enabled"] = check
+        result = f"{params['option'].split(':')[0]} is now set to {Shared_vars.config.enabled_features[params['option'].split(':')[0]]['enabled']}"
+        print(result)
+        return result
+    
     elif rsp["function"] == "wolframalpha":
+        if Shared_vars.config.enabled_features["wolframalpha"]["enabled"] == False:
+            return "Wolfram Alpha is currently disabled."
         try:
             res = client.query(params["query"])
             results = ""
@@ -180,15 +191,19 @@ def Util(rsp, ip):
             else:
                 result = "Wolfram Alpha result: " + results
             if checkimage:
-                result += "\nREMINDER: include the graph images in your explanation if theres any when explaining the results in a short and concise manner."
+                result += "\nREMINDER: ALWAYS include the provided graph/plot images in your explanation if theres any when explaining the results in a short and concise manner."
             print(result)
             return result
         except Exception as e:
             return "Wolfram Alpha Error: " + str(e)
 
     elif rsp["function"] == "generateimage":
+        if Shared_vars.config.enabled_features["imagegeneration"]["enabled"] == False:
+            return "Image generation is currently disabled."
         return imagegen(params["prompt"])
     elif rsp["function"] == "runpythoncode":
+        if Shared_vars.config.enabled_features["runpythoncode"]["enabled"] == False:
+            return "Python code execution is currently disabled."
         if ip != Shared_vars.config.adminip:
             return "null"
         time.sleep(5)
@@ -215,6 +230,8 @@ def Util(rsp, ip):
         return result
 
     elif rsp["function"] == "internetsearch":
+        if Shared_vars.config.enabled_features["internetsearch"]["enabled"] == False:
+            return "Internet search is currently disabled."
         with DDGS() as ddgs:
             for r in ddgs.text(params["keywords"], safesearch="Off", max_results=4):
                 title = r["title"]

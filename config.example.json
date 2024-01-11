@@ -20,13 +20,22 @@
     },
     "Enabled_features": {
         "image_input": {
+            "enabled": true,
             "URI": "http://127.0.0.1:8080/completion"
         },
-        "image_generation": {
+        "imagegeneration": {
+            "enabled": true,
             "server_address": "127.0.0.1:8188"
         },
         "wolframalpha": {
+            "enabled": true,
             "app_id": "your-wolframalpha-app-id"
+        },
+        "runpythoncode": {
+            "enabled": true
+        },
+        "internetsearch": {
+            "enabled": true
         }
     }
   }

@@ -25,7 +25,7 @@ To use PolyMind, run the following command in the project directory:
 ```bash
 python main.py
 ```
-There are no "commands" or similar as everything is done via function calling. Clearing the context can be done by asking the model to do so.
+There are no "commands" or similar as everything is done via function calling. Clearing the context can be done by asking the model to do so, along with the Enabled features can be disabled or enabled temporarily in the same way.
 
 ## Configuration
 
@@ -39,7 +39,7 @@ The application's configuration is stored in `config.json` file. Here's a descri
 - `max_seq_len`: The maximum context length.
 - `reserve_space`: Reserves an amount of tokens equivalent to max_new_tokens in the context if set to true.
 - `LLM_parameters`: Should be self explanatory, parameters will be overriden by known working ones for now.
-- `Enabled_features, image_input, image_generation`, `wolframalpha`: URIs for llama.cpp running a multimodal model, comfyui and the app_id for wolfram alpha respectively.
+- `Enabled_features, image_input, imagegeneration`, `wolframalpha`: URIs for llama.cpp running a multimodal model, comfyui and the app_id for wolfram alpha respectively.
 
 ## Donations
 

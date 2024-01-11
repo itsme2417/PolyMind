@@ -161,7 +161,7 @@ def imagegen(msg):
     res = aspect2res(tosend)
     x = generate(
         tosend,
-        Shared_vars.config.enabled_features["image_generation"]["server_address"],
+        Shared_vars.config.enabled_features["imagegeneration"]["server_address"],
         width=res[0],
         height=res[1],
     )[0]

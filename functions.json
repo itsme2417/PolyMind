@@ -34,6 +34,13 @@
         }
     },    
     {
+        "name": "updateconfig",
+        "description": "This temporarily updates the config. Use sparingly and only when directly requested by the user.",
+        "params": {
+            "option": "The feature to enable / disable. Format is featurename:True/False, available features: 'wolframalpha', 'portscan', 'internetsearch', 'runpythoncode', 'imagegeneration'"
+        }
+    },        
+    {
         "name": "clearmemory",
         "description": "This clears the conversation and memory.",
         "params": {
