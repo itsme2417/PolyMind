@@ -181,6 +181,7 @@ def Util(rsp, ip):
                 result = "Wolfram Alpha result: " + results
             if checkimage:
                 result += "\nREMINDER: include the graph images in your explanation if theres any when explaining the results in a short and concise manner."
+            print(result)
             return result
         except Exception as e:
             return "Wolfram Alpha Error: " + str(e)
