@@ -10,6 +10,7 @@ PolyMind is a multimodal, function calling powered LLM webui. It's designed to b
 - A Python interpreter.
 
 The web parts (HTML, JS, CSS, and Flask) are written entirely by Mixtral.
+Note: The python interpreter is intentionally delayed by 5 seconds to make it easy to check the code before its ran.
 
 ## Installation
 1. Clone the repository: `git clone https://github.com/yourusername/polymind.git`

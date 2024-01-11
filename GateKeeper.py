@@ -13,6 +13,9 @@ import Shared_vars
 from comfyui import imagegen
 from inference import infer
 from scrape import scrape_site
+import requests
+from PIL import Image
+from io import BytesIO
 
 path = os.path.realpath(__file__).strip("GateKeeper.py")
 client = OpenAI(
@@ -20,7 +23,9 @@ client = OpenAI(
     api_key=Shared_vars.config.api_key,
 )
 func = ""
-client = wolframalpha.Client(Shared_vars.config.enabled_features["wolframalpha"]['app_id'])
+client = wolframalpha.Client(
+    Shared_vars.config.enabled_features["wolframalpha"]["app_id"]
+)
 
 with open(path + "functions.json") as user_file:
     fcontent = json.loads(user_file.read())
@@ -38,6 +43,12 @@ with open(path + "functions.json") as user_file:
         func += template
 
 
+def get_image_size(url):
+    response = requests.get(url)
+    img = Image.open(BytesIO(response.content))
+    return img.size[0] + img.size[1]
+
+
 def GateKeep(input, ip):
     content = ""
     print("Begin streamed GateKeeper output.")
@@ -46,7 +57,11 @@ def GateKeep(input, ip):
     try:
         ctxstr = ""
         for x in Shared_vars.vismem[f"{ip}"][-2:]:
-            ctxstr += re.sub( r'!\[.*?\]\(.*?\)|<img.*?>', '', "USER: " + x["user"] + "\n" + "PolyMind: " + x["assistant"])
+            ctxstr += re.sub(
+                r"!\[.*?\]\(.*?\)|<img.*?>",
+                "",
+                "USER: " + x["user"] + "\n" + "PolyMind: " + x["assistant"],
+            )
         content = "<startfunc>\n{"
         content += infer(
             "Input: " + input,
@@ -140,29 +155,35 @@ def Util(rsp, ip):
         Shared_vars.mem[f"{ip}"] = []
         Shared_vars.vismem[f"{ip}"] = []
         return "skipment{<" + params["message"]
-    
+
     elif rsp["function"] == "wolframalpha":
         try:
             res = client.query(params["query"])
-            results = ''
+            results = ""
             checkimage = False
             for pod in res.pods:
                 for sub in pod.subpods:
-                    if "plot" in sub.img["@alt"].lower() and not "plot |" in sub.img["@alt"].lower():
-                        results += f'<img src="{sub.img["@src"]}" alt="{sub.img["@alt"]}"/>' + '\n'
+                    if (
+                        "plot"
+                        or "image" in sub.img["@alt"].lower()
+                        and "plot |" not in sub.img["@alt"].lower()
+                    ) and get_image_size(sub.img["@src"]) > 350:
+                        results += (
+                            f'<img src="{sub.img["@src"]}" alt="{sub.img["@alt"]}"/>'
+                            + "\n"
+                        )
                         checkimage = True
                     elif sub.plaintext:
-                            results += sub.plaintext + '\n'
+                        results += sub.plaintext + "\n"
             if results == "":
                 result = "No results from Wolfram Alpha."
             else:
                 result = "Wolfram Alpha result: " + results
             if checkimage:
-                result += '\nREMINDER: include the graph images in your explanation if theres any when explaining the results in a short and concise manner.'
+                result += "\nREMINDER: include the graph images in your explanation if theres any when explaining the results in a short and concise manner."
             return result
         except Exception as e:
             return "Wolfram Alpha Error: " + str(e)
-
 
     elif rsp["function"] == "generateimage":
         return imagegen(params["prompt"])
@@ -172,7 +193,7 @@ def Util(rsp, ip):
         time.sleep(5)
         checkstring = ""
         if "plt.show()" in params["code"]:
-            plotb64 = '''import io\nimport base64\nbyt = io.BytesIO()\nplt.savefig(byt, format='png')\nbyt.seek(0)\nprint(f'data:image/png;base64,{base64.b64encode(byt.read()).decode()}',end="")'''
+            plotb64 = """import io\nimport base64\nbyt = io.BytesIO()\nplt.savefig(byt, format='png')\nbyt.seek(0)\nprint(f'data:image/png;base64,{base64.b64encode(byt.read()).decode()}',end="")"""
             ocode = params["code"]
             params["code"] = params["code"].replace("plt.show()", plotb64)
 
@@ -185,14 +206,16 @@ def Util(rsp, ip):
         stdout, stderr = output.stdout.decode(), output.stderr.decode()
         if "data:image/png;base64," in stdout:
             checkstring = "{<plotimg;" + stdout
-        result = f"Code to be ran: \n```{rsp['params']['code']}```\n<Code interpreter output>:\nstdout: {stdout}\nstderr: {stderr}\n<\Code interpreter output>" if checkstring == "" else f"Code to be ran: \n```{ocode}```\n<Code interpreter output>:\nstdout:\nstderr: {stderr}\n<\Code interpreter output>{checkstring}"
+        result = (
+            f"Code to be ran: \n```{rsp['params']['code']}```\n<Code interpreter output>:\nstdout: {stdout}\nstderr: {stderr}\n<\Code interpreter output>"
+            if checkstring == ""
+            else f"Code to be ran: \n```{ocode}```\n<Code interpreter output>:\nstdout:\nstderr: {stderr}\n<\Code interpreter output>{checkstring}"
+        )
         return result
 
     elif rsp["function"] == "internetsearch":
         with DDGS() as ddgs:
-            for r in ddgs.text(
-                params["keywords"], safesearch="Off", max_results=4
-            ):
+            for r in ddgs.text(params["keywords"], safesearch="Off", max_results=4):
                 title = r["title"]
                 link = r["href"]
                 result += f' *Title*: {title} *Link*: {link} *Body*: {r["body"]}\n*Scraped_text*: {scrape_site(link, 700)}'

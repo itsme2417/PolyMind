@@ -127,8 +127,12 @@ def infer(
         if line:
             if TABBY:
                 if " ".join(line.split(" ")[1:]) != "[DONE]":
-                    
-                    if json.loads(" ".join(line.split(" ")[1:]))["choices"][0]["finish_reason"] != "Generated":
+                    if (
+                        json.loads(" ".join(line.split(" ")[1:]))["choices"][0][
+                            "finish_reason"
+                        ]
+                        != "Generated"
+                    ):
                         print(line)
                     print(
                         json.loads(" ".join(line.split(" ")[1:]))["choices"][0]["text"],

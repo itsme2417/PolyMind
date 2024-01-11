@@ -46,7 +46,9 @@ def chat():
                 + "\nSYSTEM: Image generated with Stable Diffusion and sent to user succesfully."
             )
             genedimage = True
-        elif Kept != "null" and Kept and "skipment" not in Kept and "plotimg" not in Kept:
+        elif (
+            Kept != "null" and Kept and "skipment" not in Kept and "plotimg" not in Kept
+        ):
             newinp += answers.strip() + "\nSYSTEM: " + Kept
         elif "skipment" in Kept:
             return jsonify(
