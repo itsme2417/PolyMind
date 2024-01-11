@@ -38,6 +38,7 @@ def chat():
         answers = Adapters(user_input)
         Kept = GateKeep(answers, request.remote_addr)
         newinp = ""
+        imgstr = ""
         genedimage = False
         if type(Kept) == list:
             newinp += (
@@ -45,7 +46,7 @@ def chat():
                 + "\nSYSTEM: Image generated with Stable Diffusion and sent to user succesfully."
             )
             genedimage = True
-        elif Kept != "null" and Kept and "skipment" not in Kept:
+        elif Kept != "null" and Kept and "skipment" not in Kept and "plotimg" not in Kept:
             newinp += answers.strip() + "\nSYSTEM: " + Kept
         elif "skipment" in Kept:
             return jsonify(
@@ -55,6 +56,10 @@ def chat():
                     .replace(">", "&gt;")
                 }
             )
+        elif "{<plotimg;" in Kept:
+            newinp = answers.strip()
+            newinp += Kept.split("{<plotimg;")[0]
+            imgstr = Kept.split("{<plotimg;")[1]
         else:
             newinp = ""
             newinp += answers.strip()
@@ -78,10 +83,6 @@ def chat():
                 "SYSTEM:",
             ],
         )
-        if "<gatekeep>" in complete[0]:
-            Kept = GateKeep(complete[0], request.remote_addr)
-            if type(Kept) == list:
-                genedimage = True
         Shared_vars.mem[f"{request.remote_addr}"] = complete[1]
         Shared_vars.vismem[f"{request.remote_addr}"].append(
             {"user": user_input, "assistant": complete[0]}
@@ -90,6 +91,8 @@ def chat():
         if genedimage:
             img = create_thumbnail(Kept[0])
             return jsonify({"output": complete[0], "base64_image": img})
+        elif imgstr != "":
+            return jsonify({"output": complete[0], "base64_image": imgstr})
         else:
             return jsonify({"output": complete[0]})
     else:

@@ -73,6 +73,7 @@ def GateKeep(input, ip):
                 "}<",
                 "</startfunc>",
             ],
+            max_tokens=500,
         )[0]
     except TypeError:
         content = "<startfunc>\n{"
@@ -101,6 +102,7 @@ def GateKeep(input, ip):
                 "}<",
                 "</startfunc>",
             ],
+            max_tokens=500,
         )[0]
 
     try:
@@ -168,6 +170,12 @@ def Util(rsp, ip):
         if ip != Shared_vars.config.adminip:
             return "null"
         time.sleep(5)
+        checkstring = ""
+        if "plt.show()" in params["code"]:
+            plotb64 = '''import io\nimport base64\nbyt = io.BytesIO()\nplt.savefig(byt, format='png')\nbyt.seek(0)\nprint(f'data:image/png;base64,{base64.b64encode(byt.read()).decode()}',end="")'''
+            ocode = params["code"]
+            params["code"] = params["code"].replace("plt.show()", plotb64)
+
         output = subprocess.run(
             ["python3", "-c", params["code"]],
             stdout=subprocess.PIPE,
@@ -175,7 +183,10 @@ def Util(rsp, ip):
         )
         print(output)
         stdout, stderr = output.stdout.decode(), output.stderr.decode()
-        return f"Code to be ran: \n```{rsp['params']['code']}```\n<Code interpreter output>:\nstdout: {stdout}\nstderr: {stderr}\n<\Code interpreter output>"
+        if "data:image/png;base64," in stdout:
+            checkstring = "{<plotimg;" + stdout
+        result = f"Code to be ran: \n```{rsp['params']['code']}```\n<Code interpreter output>:\nstdout: {stdout}\nstderr: {stderr}\n<\Code interpreter output>" if checkstring == "" else f"Code to be ran: \n```{ocode}```\n<Code interpreter output>:\nstdout:\nstderr: {stderr}\n<\Code interpreter output>{checkstring}"
+        return result
 
     elif rsp["function"] == "internetsearch":
         with DDGS() as ddgs:
