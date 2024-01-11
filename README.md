@@ -6,10 +6,11 @@ PolyMind is a multimodal, function calling powered LLM webui. It's designed to b
 - Image generation using comfyui.
 - Image input with sharegpt4v (Over llama.cpp's server), OCR, and Yolo.
 - Port scanning with nmap.
-- Basic Wolfram Alpha integration.
+- Wolfram Alpha integration.
 - A Python interpreter.
 
 The web parts (HTML, JS, CSS, and Flask) are written entirely by Mixtral.
+
 Note: The python interpreter is intentionally delayed by 5 seconds to make it easy to check the code before its ran.
 
 ## Installation
