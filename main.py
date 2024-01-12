@@ -6,7 +6,8 @@ import Shared_vars
 import io
 import base64
 from PIL import Image
-from ImageRecognition import identify
+if Shared_vars.config.enabled_features["image_input"]["enabled"]:
+    from ImageRecognition import identify
 import io
 
 

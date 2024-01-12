@@ -14,3 +14,4 @@ requests==2.30.0
 torch==2.0.1
 websocket-client==1.6.4
 wolframalpha==5.0.0
+pandas==2.1.2
