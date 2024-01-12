@@ -33,7 +33,7 @@ The application's configuration is stored in `config.json` file. Here's a descri
 
 - `Backend`: The backend that runs the LLM. Options: `tabbyapi` or `llama.cpp`. (Currently only TabbyAPI is fully supported.)
 - `HOST` and `PORT`: The IP address and port of the backend.
-- `admin_ip`: The IP address of the admin/trusted user.
+- `admin_ip`: The IP address of the admin/trusted user. Neccessary to use the python interpreter and change settings.
 - `listen`: Whether to allow other hosts in the network to access the webui.
 - `api_key`: The API key for the tabby backend.
 - `max_seq_len`: The maximum context length.
