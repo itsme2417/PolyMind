@@ -58,14 +58,22 @@ def chat():
         newinp = ""
         imgstr = ""
         genedimage = False
-        if type(Kept) == list:
+        if "[<image>" in Kept:
             newinp += (
                 answers.strip()
                 + "\nSYSTEM: Image generated with Stable Diffusion and sent to user succesfully."
             )
             genedimage = True
-        elif (
-            Kept != "null" and Kept and "skipment" not in Kept and "plotimg" not in Kept
+            img = create_thumbnail(
+                Kept.replace("[", "").replace("]", "").split("<image>")[1]
+            )
+            Kept = re.sub(r"\[<image>.*?<image>\]", "", Kept)
+        if (
+            Kept != "null"
+            and Kept
+            and "skipment" not in Kept
+            and "plotimg" not in Kept
+            and "[<image>" not in Kept
         ):
             newinp += answers.strip() + "\nSYSTEM: " + Kept
         elif "skipment" in Kept:
@@ -76,11 +84,11 @@ def chat():
                     .replace(">", "&gt;")
                 }
             )
-        elif "{<plotimg;" in Kept:
+        if "{<plotimg;" in Kept:
             newinp = answers.strip()
             newinp += Kept.split("{<plotimg;")[0]
             imgstr = Kept.split("{<plotimg;")[1]
-        else:
+        if Kept == "null":
             newinp = ""
             newinp += answers.strip()
         today = datetime.now()
@@ -109,7 +117,6 @@ def chat():
         )
         complete[0] = convert_to_html_code_block(complete[0])
         if genedimage:
-            img = create_thumbnail(Kept[0])
             return jsonify({"output": complete[0], "base64_image": img})
         elif imgstr != "":
             return jsonify({"output": complete[0], "base64_image": imgstr})

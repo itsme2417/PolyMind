@@ -122,18 +122,27 @@ def infer(
 
     if request.encoding is None:
         request.encoding = "utf-8"
-
+    prevtoken = ""
+    repetitioncount = 0
     for line in request.iter_lines(decode_unicode=True):
         if line:
             if TABBY:
                 if " ".join(line.split(" ")[1:]) != "[DONE]":
                     if (
-                        json.loads(" ".join(line.split(" ")[1:]))["choices"][0][
-                            "finish_reason"
+                        prevtoken
+                        == json.loads(" ".join(line.split(" ")[1:]))["choices"][0][
+                            "text"
                         ]
-                        != "Generated"
                     ):
-                        print(line)
+                        repetitioncount += 1
+                        if repetitioncount > 5:
+                            print("Stopping loop due to repetition")
+                            break
+                    else:
+                        repetitioncount = 0
+                    prevtoken = json.loads(" ".join(line.split(" ")[1:]))["choices"][0][
+                        "text"
+                    ]
                     print(
                         json.loads(" ".join(line.split(" ")[1:]))["choices"][0]["text"],
                         end="",
@@ -152,7 +161,17 @@ def infer(
                             end="",
                             flush=True,
                         )
-
+                        if (
+                            prevtoken
+                            == json.loads(" ".join(line.split(" ")[1:]))["content"]
+                        ):
+                            repetitioncount += 1
+                        if repetitioncount > 5:
+                            print("Stopping loop due to repetition")
+                            break
+                        else:
+                            repetitioncount = 0
+                        prevtoken = json.loads(" ".join(line.split(" ")[1:]))["content"]
                         content += json.loads(" ".join(line.split(" ")[1:]))["content"]
                 except Exception as e:
                     print(e)

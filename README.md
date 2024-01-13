@@ -12,6 +12,7 @@ PolyMind is a multimodal, function calling powered LLM webui. It's designed to b
 The web parts (HTML, JS, CSS, and Flask) are written entirely by Mixtral.
 
 Note: The python interpreter is intentionally delayed by 5 seconds to make it easy to check the code before its ran.
+Note: When making multiple function calls simultaneously, only one image can be returned at a time. For instance, if you request to generate an image of a dog using comfyui and plot a sine wave using matplotlib, only one of them will be displayed.
 
 ## Installation
 1. Clone the repository: `git clone https://github.com/yourusername/polymind.git`

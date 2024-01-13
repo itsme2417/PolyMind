@@ -167,4 +167,4 @@ def imagegen(msg):
         width=res[0],
         height=res[1],
     )[0]
-    return [x, tosend]
+    return f"[<image>{x}<image>]"
