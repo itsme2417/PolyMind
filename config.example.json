@@ -25,14 +25,16 @@
         },
         "imagegeneration": {
             "enabled": true,
-            "server_address": "127.0.0.1:8188"
+            "server_address": "127.0.0.1:8188",
+            "checkpoint_name": "turbovisionxl431Fp16.p3Q5.safetensors"
         },
         "wolframalpha": {
             "enabled": true,
             "app_id": "your-wolframalpha-app-id"
         },
         "runpythoncode": {
-            "enabled": true
+            "enabled": true,
+            "depth": 3
         },
         "internetsearch": {
             "enabled": true

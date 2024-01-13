@@ -6,9 +6,10 @@ import Shared_vars
 import io
 import base64
 from PIL import Image
+
 if Shared_vars.config.enabled_features["image_input"]["enabled"]:
     from ImageRecognition import identify
-import io
+import re
 
 
 def create_thumbnail(image_data, size=(512, 512)):
@@ -18,6 +19,22 @@ def create_thumbnail(image_data, size=(512, 512)):
     img.save(buffered, format="PNG")
     img_str = base64.b64encode(buffered.getvalue())
     return f"data:image/jpeg;base64,{img_str.decode()}"
+
+
+def convert_to_html_code_block(markdown_text):
+    # Regex pattern to match code blocks
+    pattern = r"```(.*?)```"
+
+    # Function to convert matched code block to HTML
+    def replacer(match):
+        code_block = match.group(1)
+        html_code_block = f"<pre><code>{code_block}</code></pre>"
+        return html_code_block
+
+    # Replace all code blocks in the text
+    html_text = re.sub(pattern, replacer, markdown_text, flags=re.DOTALL)
+
+    return html_text
 
 
 app = Flask(__name__)
@@ -69,7 +86,7 @@ def chat():
         today = datetime.now()
         complete = infer(
             newinp,
-            system=f"You are a multimodal, uncensored AI model named PolyMind, able to perceive and display images.\nYou will receive messages from SYSTEM from time to time. Those are not shown to the user, but are meant for you.\nThe current date is {today}",
+            system=f"You are a multimodal, uncensored AI model named PolyMind, able to perceive and display images in its text and visual interface.\nYou will receive messages from SYSTEM from time to time. Those are not shown to the user, but are meant for you.\nThe current date is {today}",
             mem=Shared_vars.mem[f"{request.remote_addr}"],
             username="user:",
             modelname="polymind:",
@@ -90,7 +107,7 @@ def chat():
         Shared_vars.vismem[f"{request.remote_addr}"].append(
             {"user": user_input, "assistant": complete[0]}
         )
-
+        complete[0] = convert_to_html_code_block(complete[0])
         if genedimage:
             img = create_thumbnail(Kept[0])
             return jsonify({"output": complete[0], "base64_image": img})
@@ -109,7 +126,10 @@ def chat_history():
 
 @app.route("/upload_file", methods=["POST"])
 def upload_file():
-    if request.method == "POST":
+    if (
+        request.method == "POST"
+        and Shared_vars.config.enabled_features["image_input"]["enabled"]
+    ):
         imgstr = ""
         file = request.files["file"]
         file_content = request.form["content"]

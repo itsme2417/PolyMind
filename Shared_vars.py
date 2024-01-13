@@ -32,3 +32,18 @@ API_KEY = config.api_key
 
 TABBY = True if config.backend == "tabbyapi" else False
 address = "0.0.0.0" if config.listen else "127.0.0.1"
+
+if (
+    config.enabled_features["wolframalpha"]["enabled"]
+    and config.enabled_features["wolframalpha"]["app_id"] == ""
+    or config.enabled_features["wolframalpha"]["app_id"] == "your-wolframalpha-app-id"
+):
+    config.enabled_features["wolframalpha"]["enabled"] = False
+    print(
+        "\033[93m WARN: Wolfram Alpha has been disabled because no app_id was provided. \033[0m"
+    )
+
+if config.api_key == "your-tabby-api-key" or config.api_key == "":
+    print(
+        "\033[93m WARN: You have not set an API key, You probably want to set this if using TabbyAPI. \033[0m"
+    )

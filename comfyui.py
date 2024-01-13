@@ -91,6 +91,9 @@ def get_images(ws, prompt, server_address):
 def generate(prmpt, server_address, seed=0, width=1024, height=1024):
     prompt = prompt_text_turbovision
     prompt["6"]["inputs"]["text"] = prmpt
+    prompt["4"]["inputs"]["ckpt_name"] = Shared_vars.config.enabled_features[
+        "imagegeneration"
+    ]["checkpoint_name"]
     if not seed == 0:
         prompt["3"]["inputs"]["seed"] = seed
     else:
@@ -135,7 +138,6 @@ def aspect2res(inp):
 def imagegen(msg):
     replyid = False
     imgtoimg = False
-    sample = "1. standing white Persian cat, filmed with a Canon EOS R6, 70-200mm lens, high quality\n2. standing white Persian cat, photo, filmed with a Canon EOS R6, 70-200mm lens, high quality"
 
     payload = getsdprompts(replyid, msg, imgtoimg)
     chat_completion = openaiclient.chat.completions.create(

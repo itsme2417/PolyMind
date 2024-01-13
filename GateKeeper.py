@@ -49,7 +49,7 @@ def get_image_size(url):
     return img.size[0] + img.size[1]
 
 
-def GateKeep(input, ip):
+def GateKeep(input, ip, depth=0):
     content = ""
     print("Begin streamed GateKeeper output.")
     examplefnc = '<startfunc>{\n"function": "internetsearch",\n"params": {\n"keywords": "mixtral"\n}\n}<endfunc>'
@@ -128,16 +128,17 @@ def GateKeep(input, ip):
             .replace("\\_", "_")
             .replace("}<", "}")
             .replace("<startfunc>", "")
+            .replace("</", "")
             .replace("<", "")
-            .replace("/", "")
         )
         print(content)
-        return Util(json.loads(content.replace("Output:", "")), ip)
-    except Exception:
+        return Util(json.loads(content.replace("Output:", "")), ip, depth)
+    except Exception as e:
+        print(e)
         return "null"
 
 
-def Util(rsp, ip):
+def Util(rsp, ip, depth):
     result = ""
 
     rsp["function"] = (
@@ -155,16 +156,18 @@ def Util(rsp, ip):
         Shared_vars.mem[f"{ip}"] = []
         Shared_vars.vismem[f"{ip}"] = []
         return "skipment{<" + params["message"]
-    
+
     elif rsp["function"] == "updateconfig":
         if ip != Shared_vars.config.adminip:
             return "null"
-        check = False if params['option'].split(":")[1].lower() == "false" else True
-        Shared_vars.config.enabled_features[params['option'].split(":")[0]]["enabled"] = check
+        check = False if params["option"].split(":")[1].lower() == "false" else True
+        Shared_vars.config.enabled_features[params["option"].split(":")[0]][
+            "enabled"
+        ] = check
         result = f"{params['option'].split(':')[0]} is now set to {Shared_vars.config.enabled_features[params['option'].split(':')[0]]['enabled']}"
         print(result)
         return result
-    
+
     elif rsp["function"] == "wolframalpha":
         if Shared_vars.config.enabled_features["wolframalpha"]["enabled"] == False:
             return "Wolfram Alpha is currently disabled."
@@ -208,9 +211,9 @@ def Util(rsp, ip):
             return "null"
         time.sleep(5)
         checkstring = ""
+        ocode = params["code"]
         if "plt.show()" in params["code"]:
             plotb64 = """import io\nimport base64\nbyt = io.BytesIO()\nplt.savefig(byt, format='png')\nbyt.seek(0)\nprint(f'data:image/png;base64,{base64.b64encode(byt.read()).decode()}',end="")"""
-            ocode = params["code"]
             params["code"] = params["code"].replace("plt.show()", plotb64)
 
         output = subprocess.run(
@@ -220,10 +223,20 @@ def Util(rsp, ip):
         )
         print(output)
         stdout, stderr = output.stdout.decode(), output.stderr.decode()
+        if (
+            stderr != ""
+            and depth < Shared_vars.config.enabled_features["runpythoncode"]["depth"]
+        ):
+            print(f"Current depth: {depth}")
+            return GateKeep(
+                f"{ocode}\n The above code produced the following error\nERROR: {stderr}\n Solve the error and run the fixed code.",
+                ip,
+                depth + 1,
+            )
         if "data:image/png;base64," in stdout:
             checkstring = "{<plotimg;" + stdout
         result = (
-            f"Code to be ran: \n```{rsp['params']['code']}```\n<Code interpreter output>:\nstdout: {stdout}\nstderr: {stderr}\n<\Code interpreter output>"
+            f"Code to be ran: \n```{params['code']}```\n<Code interpreter output>:\nstdout: {stdout}\nstderr: {stderr}\n<\Code interpreter output>"
             if checkstring == ""
             else f"Code to be ran: \n```{ocode}```\n<Code interpreter output>:\nstdout:\nstderr: {stderr}\n<\Code interpreter output>{checkstring}"
         )

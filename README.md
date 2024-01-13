@@ -29,17 +29,19 @@ There are no "commands" or similar as everything is done via function calling. C
 
 ## Configuration
 
-The application's configuration is stored in `config.json` file. Here's a description of each option:
+The application's configuration is stored in the `config.json` file. Here's a description of each option:
 
 - `Backend`: The backend that runs the LLM. Options: `tabbyapi` or `llama.cpp`. (Currently only TabbyAPI is fully supported.)
 - `HOST` and `PORT`: The IP address and port of the backend.
-- `admin_ip`: The IP address of the admin/trusted user. Neccessary to use the python interpreter and change settings.
+- `admin_ip`: The IP address of the admin/trusted user. Necessary to use the Python interpreter and change settings.
 - `listen`: Whether to allow other hosts in the network to access the webui.
-- `api_key`: The API key for the tabby backend.
+- `api_key`: The API key for the Tabby backend.
 - `max_seq_len`: The maximum context length.
-- `reserve_space`: Reserves an amount of tokens equivalent to max_new_tokens in the context if set to true.
-- `LLM_parameters`: Should be self explanatory, parameters will be overriden by known working ones for now.
-- `Enabled_features, image_input, imagegeneration`, `wolframalpha`: URIs for llama.cpp running a multimodal model, comfyui and the app_id for wolfram alpha respectively.
+- `reserve_space`: Reserves an amount of tokens equivalent to `max_new_tokens` in the context if set to true.
+- `LLM_parameters`: Should be self-explanatory, parameters will be overridden by known working ones for now.
+- `Enabled_features`, `image_input`, `imagegeneration`, `wolframalpha`: URIs for llama.cpp running a multimodal model, comfyui, and the app_id for Wolfram Alpha respectively.
+- `runpythoncode/depth`: Specifies the maximum number of attempts GateKeeper can make to debug non-running code. To disable this feature, set it to 0.
+- `imagegeneration/checkpoint_name`: Specifies the filename of the SD checkpoint for comfyui.
 
 ## Donations
 
