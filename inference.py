@@ -135,7 +135,7 @@ def infer(
                         ]
                     ):
                         repetitioncount += 1
-                        if repetitioncount > 5:
+                        if repetitioncount > 25:
                             print("Stopping loop due to repetition")
                             break
                     else:
@@ -166,7 +166,7 @@ def infer(
                             == json.loads(" ".join(line.split(" ")[1:]))["content"]
                         ):
                             repetitioncount += 1
-                        if repetitioncount > 5:
+                        if repetitioncount > 25:
                             print("Stopping loop due to repetition")
                             break
                         else:
