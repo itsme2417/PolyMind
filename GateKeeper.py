@@ -16,8 +16,9 @@ from scrape import scrape_site
 import requests
 from PIL import Image
 from io import BytesIO
+from pathlib import Path
 
-path = os.path.realpath(__file__).strip("GateKeeper.py")
+path = Path(os.path.abspath(__file__)).parent
 client = OpenAI(
     base_url=f"http://{Shared_vars.config.host}:{Shared_vars.config.port}/v1",
     api_key=Shared_vars.config.api_key,
@@ -27,7 +28,7 @@ client = wolframalpha.Client(
     Shared_vars.config.enabled_features["wolframalpha"]["app_id"]
 )
 
-with open(path + "functions.json") as user_file:
+with open(os.path.join(path,"functions.json")) as user_file:
     fcontent = json.loads(user_file.read())
     for x in fcontent:
         params = (
@@ -58,7 +59,7 @@ def GateKeep(input, ip, depth=0):
         ctxstr = ""
         for x in Shared_vars.vismem[f"{ip}"][-2:]:
             ctxstr += re.sub(
-                r"!\[.*?\]\(.*?\)|<img.*?>",
+                r"!\[.*?\]\(.*?\)|<img.*?>|\[\{.*?\}\]",
                 "",
                 "USER: " + x["user"] + "\n" + "PolyMind: " + x["assistant"],
             )

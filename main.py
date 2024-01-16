@@ -109,6 +109,7 @@ def chat():
                 "<|im_end|>",
                 "<|im_start|>",
                 "SYSTEM:",
+                '<img src="data:image/jpeg;base64,',
             ],
         )
         Shared_vars.mem[f"{request.remote_addr}"] = complete[1]

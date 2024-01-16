@@ -15,9 +15,10 @@ Note: The python interpreter is intentionally delayed by 5 seconds to make it ea
 Note: When making multiple function calls simultaneously, only one image can be returned at a time. For instance, if you request to generate an image of a dog using comfyui and plot a sine wave using matplotlib, only one of them will be displayed.
 
 ## Installation
-1. Clone the repository: `git clone https://github.com/yourusername/polymind.git`
+1. Clone the repository: `git clone https://github.com/itsme2417/PolyMind.git && cd PolyMind`
 2. Install the required dependencies: `pip install -r requirements.txt`
-3. Copy `config.example.json` as `config.json` and fill in required settings.
+3. Install the required node modules: `cd static && npm install`
+4. Copy `config.example.json` as `config.json` and fill in required settings.
 
 ## Usage
 
