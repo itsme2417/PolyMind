@@ -16,7 +16,7 @@ class Config:
         self.listen = config["listen"]
         self.llm_parameters = config["LLM_parameters"]
         self.backend = config["Backend"]
-        self.host = config["HOST"]
+        self.host = config["HOST"].rstrip("/") if config["HOST"].endswith("/") else config["HOST"]
         self.port = config["PORT"]
         self.enabled_features = config["Enabled_features"]
         self.adminip = config["admin_ip"]
@@ -27,7 +27,8 @@ class Config:
 
 
 config = Config()
-API_ENDPOINT_URI = f"http://{config.host}:{config.port}/"
+API_ENDPOINT_URI = f"{config.host}:{config.port}/" if config.host.lower().startswith('http') else  f"http://{config.host}:{config.port}/"
+
 API_KEY = config.api_key
 
 TABBY = True if config.backend == "tabbyapi" else False

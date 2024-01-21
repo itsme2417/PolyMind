@@ -60,6 +60,7 @@ def infer(
     top_p=1.0,
     top_k=Shared_vars.config.llm_parameters["top_k"],
     min_p=0.0,
+    streamresp=False,
 ):
     content = ""
     "<s> [INST] Instruction [/INST] Model answer</s> [INST] Follow-up instruction [/INST]"
@@ -148,10 +149,14 @@ def infer(
                         end="",
                         flush=True,
                     )
+                    if streamresp:
+                        yield json.loads(" ".join(line.split(" ")[1:]))["choices"][0][
+                            "text"
+                        ]
 
                     content += json.loads(" ".join(line.split(" ")[1:]))["choices"][0][
-                        "text"
-                    ]
+                            "text"
+                        ]
 
             else:
                 try:
@@ -172,12 +177,17 @@ def infer(
                         else:
                             repetitioncount = 0
                         prevtoken = json.loads(" ".join(line.split(" ")[1:]))["content"]
+                        if streamresp:
+                            yield json.loads(" ".join(line.split(" ")[1:]))["content"]
+
                         content += json.loads(" ".join(line.split(" ")[1:]))["content"]
+                        
                 except Exception as e:
-                    print(e)
                     print(traceback.format_exc())
     print("")
     memory.append(
         f"\n{beginsep} {username} {prmpt.strip()}\n{endsep} {modelname} {content.strip()}{eos}"
     )
-    return [content, memory, tokenize(prompt)["length"]]
+
+    yield [content, memory, tokenize(prompt)["length"]]
+

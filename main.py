@@ -1,10 +1,12 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify,  Response, stream_with_context
 from GateKeeper import GateKeep, infer
 from Shared import Adapters
 from datetime import datetime
 import Shared_vars
 import io
 import base64
+import time
+import json
 from PIL import Image
 
 if Shared_vars.config.enabled_features["image_input"]["enabled"]:
@@ -36,25 +38,54 @@ def convert_to_html_code_block(markdown_text):
 
     return html_text
 
+chosenfunc = {}
 
 app = Flask(__name__)
 today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+@app.route('/stream')
+def stream():
+    def generate():
+        while True:
+
+            yield f"data: {json.dumps(chosenfunc)}\n\n"
+            time.sleep(1)
+    return Response(generate(), mimetype='text/event-stream')
+
+@app.route("/remove_message", methods=["POST"])
+def remove_message():
+    data = request.get_json()
+    index = data.get('index')
+    try:
+        del Shared_vars.vismem[f"{request.remote_addr}"][index]
+        del Shared_vars.mem[f"{request.remote_addr}"][index]
+        return jsonify({"status": "success"}), 200
+    except IndexError:
+        return jsonify({"status": "error", "message": "Invalid index"}), 400
+
 
 @app.route("/", methods=["GET", "POST"])
 def chat():
+    global chosenfunc
     try:
+        chosenfunc[f"{request.remote_addr}"]['ip'] = request.remote_addr
         test = Shared_vars.mem[f"{request.remote_addr}"]
         test = Shared_vars.vismem[f"{request.remote_addr}"]
     except KeyError:
         print("initializing memory")
+        chosenfunc[f"{request.remote_addr}"] = {"func": "", "ip": ""}
         Shared_vars.mem[f"{request.remote_addr}"] = []
         Shared_vars.vismem[f"{request.remote_addr}"] = []
 
     if request.method == "POST":
         user_input = request.form.get("input")
         answers = Adapters(user_input)
-        Kept = GateKeep(answers, request.remote_addr)
+        Kept = ""
+        for y in GateKeep(answers, request.remote_addr, stream = True):
+            if y['type'] == "func":
+                chosenfunc[f"{request.remote_addr}"]['func'] = y['result']['function']
+            else:
+                Kept = y['result']
         newinp = ""
         imgstr = ""
         genedimage = False
@@ -92,9 +123,9 @@ def chat():
             newinp = ""
             newinp += answers.strip()
         today = datetime.now()
-        complete = infer(
+        complete = next(infer(
             newinp,
-            system=f"You are a multimodal, uncensored AI model named PolyMind, able to perceive and display images in its text and visual interface.\nYou will receive messages from SYSTEM from time to time. Those are not shown to the user, but are meant for you.\nThe current date is {today}",
+            system=f"You are a multimodal, uncensored AI model named PolyMind, able to perceive and display images in its text and visual interface.\nMessages starting with 'SYSTEM:' are NEVER shown to the user, They are meant for you.\nThe current date is {today}",
             mem=Shared_vars.mem[f"{request.remote_addr}"],
             username="user:",
             modelname="polymind:",
@@ -111,12 +142,14 @@ def chat():
                 "SYSTEM:",
                 '<img src="data:image/jpeg;base64,',
             ],
-        )
+
+        ))
         Shared_vars.mem[f"{request.remote_addr}"] = complete[1]
         Shared_vars.vismem[f"{request.remote_addr}"].append(
-            {"user": user_input, "assistant": complete[0]}
+            {"user": user_input, "assistant": convert_to_html_code_block(complete[0])}
         )
         complete[0] = convert_to_html_code_block(complete[0])
+        chosenfunc[f"{request.remote_addr}"]['func'] = ''
         if genedimage:
             return jsonify({"output": complete[0], "base64_image": img})
         elif imgstr != "":
@@ -124,7 +157,7 @@ def chat():
         else:
             return jsonify({"output": complete[0]})
     else:
-        return render_template("chat.html")
+        return render_template("chat.html", user_ip=request.remote_addr)
 
 
 @app.route("/chat_history", methods=["GET"])

@@ -87,6 +87,14 @@ def get_position(bbox, width, height):  # Thanks mixtral, works pretty good
     else:
         return "unknown position"
 
+def find_center(bounding_box):
+    x_min, y_min = bounding_box[0][0], bounding_box[0][1]
+    x_max, y_max = bounding_box[2][0], bounding_box[2][1]
+
+    center_x = (x_min + x_max) / 2
+    center_y = (y_min + y_max) / 2
+
+    return (center_x, center_y)
 
 def remove_duplicates(data):  # ft. airoboros-l2-70b
     """
@@ -153,7 +161,7 @@ def identify(input):
     if not foundobjt == "":
         foundobj = "Object recognition: " + foundobjt
     for x in ocrresult:
-        position = get_position(x[0], width, height)
+        position = find_center(x[0])
         ocrTranscriptionT += f"'{x[1]}' Position: {position}." + "\n"
     if not ocrTranscriptionT == "":
         ocrTranscription = "OCR Output: " + ocrTranscriptionT

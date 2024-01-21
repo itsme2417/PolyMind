@@ -159,6 +159,34 @@
             word-wrap: break-word;
             word-break: normal;
         }
+        .loading-circle {
+            width: 1em; /* same as font-size */
+            height: 1em; /* same as font-size */
+            display: inline-block; /* to place it in line with text */
+            vertical-align: middle; /* to align it with the text */
+            transform: rotate(-90deg);
+        }
+
+        .circle-bg {
+            fill: none;
+            stroke: #eee;
+            stroke-width: 0.6em; /* increased for visibility */
+        }
+
+        .circle {
+            fill: none;
+            stroke: #3498db;
+            stroke-width: 0.6em; /* increased for visibility */
+            stroke-dasharray: 283; /* this value might need to be adjusted */
+            stroke-dashoffset: 283; /* this value might need to be adjusted */
+            animation: fill 6s infinite alternate ease-in-out;
+        }
+
+        @keyframes fill {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
         
     </style>
     <script src="{{ url_for('static', filename='node_modules/marked/marked.min.js')}}"></script>
@@ -199,8 +227,54 @@
                 return hljs.highlightAuto(code).value;
             }
         });
+        var userIp = "{{ user_ip }}";
+        var ran = false;
+        var source = new EventSource('/stream');
+        var shownmsg;
+        
+        source.onmessage = function(event) {
+            // Handle incoming messages
+            var jsondata = JSON.parse(event.data)[userIp]
 
+            if (userIp == jsondata.ip){
 
+                if (jsondata.func != "" && jsondata.func != "acknowledge" && !ran){
+                var loader = `<svg class="loading-circle" viewBox="0 0 100 100">
+                        <circle class="circle-bg" cx="50" cy="50" r="45"></circle>
+                        <circle class="circle" cx="50" cy="50" r="45"></circle>
+                    </svg>`
+                    
+                    switch (jsondata.func) {
+                        case 'internetsearch':
+                            shownmsg = appendOutput(loader + '<span><small> Searching the internet' + "</small></span>" , false);
+                            ran = true
+                            break;
+                        case 'portscan':
+                            shownmsg = appendOutput(loader + '<span><small> Scanning for ports' + "</small></span>" , false);
+                            ran = true
+                            break;
+                        case 'wolframalpha':
+                            shownmsg = appendOutput(loader + '<span><small> Using wolfram|alpha' + "</small></span>" , false);
+                            ran = true
+                            break;
+                        case 'runpythoncode':
+                            shownmsg = appendOutput(loader + '<span><small> Running code' + "</small></span>" , false);
+                            ran = true
+                            break;
+                        case 'generateimage':
+                            shownmsg = appendOutput(loader + '<span><small> Generating an image' + "</small></span>" , false);
+                            ran = true
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else {
+                    if (!ran && shownmsg)
+                        outputDiv.removeChild(shownmsg);
+                };
+            };
+        }
 
         function appendOutput(message, isUserInput) {
             let parsedMessage = message
@@ -215,6 +289,7 @@
             }
             outputDiv.appendChild(p);
             outputDiv.scrollTop = outputDiv.scrollHeight;
+            return p
         }
 
         window.onload = function() {
@@ -256,6 +331,7 @@
                     data.output.split('--newline--').forEach(message => {
                         message = markdownParser(message);
                         appendOutput(message, false); // Display assistant response messages
+                        ran = false
                     });
                     document.querySelector('input[name="input"]').value = '';
                 }

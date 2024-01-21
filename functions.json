@@ -28,7 +28,7 @@
     },    
     {
         "name": "runpythoncode",
-        "description": "This runs python code. Use sparingly. Only execute code when asked to directly by the user or when absolutely neccessary to solve things like complex math.",
+        "description": "This runs python code. Use sparingly. Only execute code when asked to directly by the user or when absolutely neccessary to solve things like complex math. Do not use newlines. Write the code in a single line. Always include a print statement as the user can only see stdout.",
         "params": {
             "code": "The python code to run."
         }

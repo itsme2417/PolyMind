@@ -31,6 +31,12 @@ with open(
 ) as workflow:
     prompt_text_turbovision = json.load(workflow)
 
+with open(
+    os.path.join(
+        Path(os.path.abspath(__file__)).parent, "comfyui_workflow_turbovision_stablefast.json"
+    )
+) as workflow:
+    prompt_text_turbovision_stablefast = json.load(workflow)
 
 def queue_prompt(prompt, server_address):
     p = {"prompt": prompt, "client_id": client_id}
@@ -89,7 +95,7 @@ def get_images(ws, prompt, server_address):
 
 
 def generate(prmpt, server_address, seed=0, width=1024, height=1024):
-    prompt = prompt_text_turbovision
+    prompt = prompt_text_turbovision_stablefast
     prompt["6"]["inputs"]["text"] = prmpt
     prompt["4"]["inputs"]["ckpt_name"] = Shared_vars.config.enabled_features[
         "imagegeneration"

@@ -50,7 +50,7 @@ def get_image_size(url):
     return img.size[0] + img.size[1]
 
 
-def GateKeep(input, ip, depth=0):
+def GateKeep(input, ip, depth=0, stream=False):
     content = ""
     print("Begin streamed GateKeeper output.")
     examplefnc = '<startfunc>{\n"function": "internetsearch",\n"params": {\n"keywords": "mixtral"\n}\n}<endfunc>'
@@ -64,7 +64,7 @@ def GateKeep(input, ip, depth=0):
                 "USER: " + x["user"] + "\n" + "PolyMind: " + x["assistant"],
             )
         content = "<startfunc>\n[{"
-        content += infer(
+        content += next(infer(
             "Input: " + input,
             mem=[],
             modelname="Output:\n<startfunc>\n[{",
@@ -90,10 +90,10 @@ def GateKeep(input, ip, depth=0):
                 "</startfunc>",
             ],
             max_tokens=500,
-        )[0]
+        ))[0]
     except TypeError:
         content = "<startfunc>\n{"
-        content += infer(
+        content += next(infer(
             "Input: " + input,
             mem=[],
             modelname="Output:\n<startfunc>\n[{",
@@ -119,7 +119,7 @@ def GateKeep(input, ip, depth=0):
                 "</startfunc>",
             ],
             max_tokens=500,
-        )[0]
+        ))[0]
 
     try:
         if "<startfunc>" in content:
@@ -134,15 +134,25 @@ def GateKeep(input, ip, depth=0):
         )
         print(content)
         result = ""
+
         for x in json.loads(content.replace("Output:", "")):
+            if stream:
+                yield {"result": x, "type": "func"}
             run = Util(x, ip, depth)
             if run != "null":
                 result += run
-
-        return result if result != "" else "null"
+        if stream:
+            result = result if result != "" else "null" 
+            result = {"result": result, "type": "result"}
+            yield result
+        else:
+            return result if result != "" else "null"
     except Exception as e:
         print(e)
-        return "null"
+        if stream:
+            yield {"result": "null", "type": "result"}
+        else:
+            return "null"
 
 
 def Util(rsp, ip, depth):
@@ -221,6 +231,7 @@ def Util(rsp, ip, depth):
         checkstring = ""
         ocode = params["code"]
         if "plt.show()" in params["code"]:
+            params["code"] = re.sub('print\s*\(.*\)', '', params["code"])
             plotb64 = """import io\nimport base64\nbyt = io.BytesIO()\nplt.savefig(byt, format='png')\nbyt.seek(0)\nprint(f'data:image/png;base64,{base64.b64encode(byt.read()).decode()}',end="")"""
             params["code"] = params["code"].replace("plt.show()", plotb64)
 
@@ -235,11 +246,11 @@ def Util(rsp, ip, depth):
             and depth < Shared_vars.config.enabled_features["runpythoncode"]["depth"]
         ):
             print(f"Current depth: {depth}")
-            return GateKeep(
-                f"{ocode}\n The above code produced the following error\nERROR: {stderr}\n Solve the error and run the fixed code.",
+            return next(GateKeep(
+                f"```{ocode}```\n The above code produced the following error\n{stderr}\n Rewrite the code to solve the error and run the fixed code.",
                 ip,
                 depth + 1,
-            )
+            ))
         if "data:image/png;base64," in stdout:
             checkstring = "{<plotimg;" + stdout
             print(
