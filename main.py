@@ -83,7 +83,10 @@ def chat():
         Kept = ""
         for y in GateKeep(answers, request.remote_addr, stream = True):
             if y['type'] == "func":
-                chosenfunc[f"{request.remote_addr}"]['func'] = y['result']['function']
+                try:
+                    chosenfunc[f"{request.remote_addr}"]['func'] = y['result']['function']
+                except Exception:
+                    chosenfunc[f"{request.remote_addr}"]['func'] = ""
             else:
                 Kept = y['result']
         newinp = ""
