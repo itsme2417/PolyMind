@@ -60,7 +60,7 @@
         "name": "searchfile",
         "description": "This searches through a file the user has uploaded and returns the matching text.",
         "params": {
-            "query": "The user's query, as is."
+            "query": "The user's query, to be used with semantic search."
 
        }
      }

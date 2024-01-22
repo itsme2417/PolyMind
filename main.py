@@ -153,7 +153,7 @@ def chat():
         Shared_vars.vismem[f"{request.remote_addr}"].append(
             {"user": user_input, "assistant": convert_to_html_code_block(complete[0])}
         )
-        complete[0] = convert_to_html_code_block(complete[0])
+        complete[0] = convert_to_html_code_block(complete[0]).replace("\n","<br>")
         chosenfunc[f"{request.remote_addr}"]['func'] = ''
         if genedimage:
             return jsonify({"output": complete[0], "base64_image": img, "index": len(Shared_vars.vismem[f"{request.remote_addr}"]) - 1})
@@ -172,6 +172,7 @@ def chat_history():
 
 @app.route("/upload_file", methods=["POST"])
 def upload_file():
+    global chosenfunc
     if (
         request.method == "POST"
         and (Shared_vars.config.enabled_features["image_input"]["enabled"] or Shared_vars.config.enabled_features["file_input"]["enabled"])
@@ -179,7 +180,7 @@ def upload_file():
         imgstr = ""
         file = request.files["file"]
         file_content = request.form["content"]
-        if (".jpg" in file.filename or ".png" in file.filename) and Shared_vars.config.enabled_features["image_input"]["enabled"] :
+        if (".jpg" in file.filename or ".png" in file.filename or ".jpeg" in file.filename) and Shared_vars.config.enabled_features["image_input"]["enabled"] :
             Shared_vars.mem[f"{request.remote_addr}"].append(
                 f"\n{Shared_vars.config.llm_parameters['beginsep']} user: {identify(file_content.split(',')[1])} {Shared_vars.config.llm_parameters['endsep']}"
             )
@@ -192,6 +193,10 @@ def upload_file():
                 }
             )
         elif Shared_vars.config.enabled_features["file_input"]["enabled"]:
+            if f"{request.remote_addr}" in chosenfunc:
+                chosenfunc[f"{request.remote_addr}"]['func'] = 'loadembed'
+            else:
+                chosenfunc[f"{request.remote_addr}"] = {"func": 'loadembed', "ip": f"{request.remote_addr}"}
             chunks = handleFile(file_content)
             if len(chunks) <= 1:
                 Shared_vars.loadedfile[f"{request.remote_addr}"] = {}
@@ -200,6 +205,8 @@ def upload_file():
                 )
             else:
                 Shared_vars.loadedfile[f"{request.remote_addr}"] = chunks
+            chosenfunc[f"{request.remote_addr}"]['func'] = ''
+
         return jsonify({"message": f"{file.filename} uploaded successfully."})
 
 

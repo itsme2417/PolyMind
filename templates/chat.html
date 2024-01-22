@@ -269,6 +269,10 @@
                             shownmsg = appendOutput(loader + '<span><small> Performing RAG' + "</small></span>" , false);
                             ran = true
                             break;
+                        case 'loadembed':
+                            shownmsg = appendOutput(loader + '<span><small> Creating Embeddings' + "</small></span>" , false);
+                            ran = true
+                            break;
                         default:
                             break;
                     }
@@ -390,6 +394,7 @@
                                 outputDiv.scrollTop = outputDiv.scrollHeight;
                             } else {
                                 appendOutput(data.message, true);
+                                ran = false
                             }
                         });
                     };

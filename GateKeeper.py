@@ -7,6 +7,8 @@ import time
 import wolframalpha
 from duckduckgo_search import DDGS
 import nmap
+import traceback
+
 from datetime import datetime
 import subprocess
 import Shared_vars
@@ -151,6 +153,13 @@ def GateKeep(input, ip, depth=0, stream=False):
         for x in json.loads(content.replace("Output:", "")):
             if stream:
                 yield {"result": x, "type": "func"}
+
+            if x['function'] == "searchfile" and Shared_vars.config.enabled_features['file_input']['raw_input']:
+                if 'params' in x:
+                    x['params']['query'] = input
+                else:
+                    x['query'] = input
+
             run = Util(x, ip, depth)
             if run != "null":
                 result += run
@@ -185,6 +194,8 @@ def Util(rsp, ip, depth):
     elif rsp["function"] == "clearmemory":
         Shared_vars.mem[f"{ip}"] = []
         Shared_vars.vismem[f"{ip}"] = []
+        if ip in Shared_vars.loadedfile:
+            Shared_vars.loadedfile[ip] = {}
         return "skipment{<" + params["message"]
 
     elif rsp["function"] == "updateconfig":
@@ -238,6 +249,7 @@ def Util(rsp, ip, depth):
     elif rsp["function"] == "searchfile":
         file = Shared_vars.loadedfile[ip]
         searchinput = params["query"]
+        print(f"Using query: {searchinput}")
         return f"<FILE_CHUNK {queryEmbeddings(searchinput, file[0], file[1])[1]} >"
 
     elif rsp["function"] == "runpythoncode":

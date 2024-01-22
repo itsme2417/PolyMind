@@ -79,16 +79,20 @@ def handleFile(file):
     md5sum = hashlib.md5(file.encode('utf-8')).hexdigest()
     file = checkformat(file)
     
-    chunks = split_into_chunks(file, config.enabled_features["file_input"]["chunk_size"])
-    if len(chunks) <= 1:
-        return chunks
+    if tokenize(file)[0] <= config.enabled_features["file_input"]["chunk_size"]:
+        return [file]
     else:
         cached = check_cache(f"{md5sum}.json")
-        if cached != False:
-            embeddings = json.loads(cached)['embeddings']
+        if cached != False and json.loads(cached)["chunk_size"] == config.enabled_features["file_input"]["chunk_size"]:
+            cached = json.loads(cached)
+            chunks = cached['chunks']
+
+            embeddings = cached['embeddings']
             print("Using cached embeddings.")
         else:
+            chunks = split_into_chunks(file, config.enabled_features["file_input"]["chunk_size"])
+
             embeddings = model.encode(chunks)
             with open(os.path.join(path, f"embeddings_cache/{md5sum}.json"), 'w') as f:
-                json.dump({"embeddings": embeddings},f, cls=NumpyEncoder)
+                json.dump({"embeddings": embeddings, "chunks": chunks, "chunk_size": config.enabled_features["file_input"]["chunk_size"]},f, cls=NumpyEncoder)
     return embeddings, chunks
