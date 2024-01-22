@@ -16,7 +16,7 @@ Note: The python interpreter is intentionally delayed by 5 seconds to make it ea
 
 Note: When making multiple function calls simultaneously, only one image can be returned at a time. For instance, if you request to generate an image of a dog using comfyui and plot a sine wave using matplotlib, only one of them will be displayed.
 
-Note: When using RAG, make it clear that you are requesting information according to the file youve uploaded.
+Note: When using RAG, make it clear that you are requesting information according to the file you've uploaded.
 
 ## Installation
 1. Clone the repository: `git clone https://github.com/itsme2417/PolyMind.git && cd PolyMind`
