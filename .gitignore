@@ -167,3 +167,4 @@ node_modules/.package-lock.json
 .gitignore
 node_modules/
 memory.json
+embeddings_cache/*

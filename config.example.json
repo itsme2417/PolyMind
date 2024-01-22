@@ -23,6 +23,10 @@
             "enabled": true,
             "URI": "http://127.0.0.1:8080/completion"
         },
+        "file_input": {
+            "enabled": true,
+            "chunk_size": 250
+        },
         "imagegeneration": {
             "enabled": true,
             "server_address": "127.0.0.1:8188",

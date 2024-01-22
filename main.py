@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify,  Response, stream_with_context
+from flask import Flask, render_template, request, jsonify,  Response
 from GateKeeper import GateKeep, infer
 from Shared import Adapters
 from datetime import datetime
@@ -8,7 +8,8 @@ import base64
 import time
 import json
 from PIL import Image
-
+if Shared_vars.config.enabled_features["file_input"]["enabled"]:
+    from FileHandler import handleFile
 if Shared_vars.config.enabled_features["image_input"]["enabled"]:
     from ImageRecognition import identify
 import re
@@ -39,6 +40,7 @@ def convert_to_html_code_block(markdown_text):
     return html_text
 
 chosenfunc = {}
+
 
 app = Flask(__name__)
 today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -154,11 +156,11 @@ def chat():
         complete[0] = convert_to_html_code_block(complete[0])
         chosenfunc[f"{request.remote_addr}"]['func'] = ''
         if genedimage:
-            return jsonify({"output": complete[0], "base64_image": img})
+            return jsonify({"output": complete[0], "base64_image": img, "index": len(Shared_vars.vismem[f"{request.remote_addr}"]) - 1})
         elif imgstr != "":
-            return jsonify({"output": complete[0], "base64_image": imgstr})
+            return jsonify({"output": complete[0], "base64_image": imgstr, "index": len(Shared_vars.vismem[f"{request.remote_addr}"]) - 1})
         else:
-            return jsonify({"output": complete[0]})
+            return jsonify({"output": complete[0], "index": len(Shared_vars.vismem[f"{request.remote_addr}"]) - 1})
     else:
         return render_template("chat.html", user_ip=request.remote_addr)
 
@@ -172,12 +174,12 @@ def chat_history():
 def upload_file():
     if (
         request.method == "POST"
-        and Shared_vars.config.enabled_features["image_input"]["enabled"]
+        and (Shared_vars.config.enabled_features["image_input"]["enabled"] or Shared_vars.config.enabled_features["file_input"]["enabled"])
     ):
         imgstr = ""
         file = request.files["file"]
         file_content = request.form["content"]
-        if ".jpg" in file.filename or ".png" in file.filename:
+        if (".jpg" in file.filename or ".png" in file.filename) and Shared_vars.config.enabled_features["image_input"]["enabled"] :
             Shared_vars.mem[f"{request.remote_addr}"].append(
                 f"\n{Shared_vars.config.llm_parameters['beginsep']} user: {identify(file_content.split(',')[1])} {Shared_vars.config.llm_parameters['endsep']}"
             )
@@ -189,7 +191,16 @@ def upload_file():
                     )
                 }
             )
-        return jsonify({"message": f"File uploaded successfully.{imgstr}"})
+        elif Shared_vars.config.enabled_features["file_input"]["enabled"]:
+            chunks = handleFile(file_content)
+            if len(chunks) <= 1:
+                Shared_vars.loadedfile[f"{request.remote_addr}"] = {}
+                Shared_vars.mem[f"{request.remote_addr}"].append(
+                    f"\n{Shared_vars.config.llm_parameters['beginsep']} user: <FILE {file.filename}> {chunks[0]} {Shared_vars.config.llm_parameters['endsep']}"
+                )
+            else:
+                Shared_vars.loadedfile[f"{request.remote_addr}"] = chunks
+        return jsonify({"message": f"{file.filename} uploaded successfully."})
 
 
 if __name__ == "__main__":

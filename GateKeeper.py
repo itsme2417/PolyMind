@@ -13,6 +13,8 @@ import Shared_vars
 from comfyui import imagegen
 from inference import infer
 from scrape import scrape_site
+if Shared_vars.config.enabled_features["file_input"]["enabled"]:
+    from FileHandler import queryEmbeddings
 import requests
 from PIL import Image
 from io import BytesIO
@@ -29,6 +31,7 @@ client = wolframalpha.Client(
 )
 
 with open(os.path.join(path,"functions.json")) as user_file:
+    global searchfunc
     fcontent = json.loads(user_file.read())
     for x in fcontent:
         params = (
@@ -41,7 +44,12 @@ with open(os.path.join(path,"functions.json")) as user_file:
         description: {x['description']}
         params:
             {params}"""
-        func += template
+
+        if x['name'] == "searchfile":
+            searchfunc = template
+            continue
+        else:
+            func += template
 
 
 def get_image_size(url):
@@ -54,7 +62,12 @@ def GateKeep(input, ip, depth=0, stream=False):
     content = ""
     print("Begin streamed GateKeeper output.")
     examplefnc = '<startfunc>{\n"function": "internetsearch",\n"params": {\n"keywords": "mixtral"\n}\n}<endfunc>'
-    fewshot = f"""{Shared_vars.config.llm_parameters['beginsep']} Input:\nDescribe the model mixtral.{Shared_vars.config.llm_parameters['endsep']}{examplefnc}"""
+    funclist = func
+    try:
+        if Shared_vars.loadedfile[ip] != {}:
+            funclist += searchfunc
+    except Exception:
+        pass
     try:
         ctxstr = ""
         for x in Shared_vars.vismem[f"{ip}"][-2:]:
@@ -68,7 +81,7 @@ def GateKeep(input, ip, depth=0, stream=False):
             "Input: " + input,
             mem=[],
             modelname="Output:\n<startfunc>\n[{",
-            system=f"You are an AI assistant named GateKeeper, The current date is {datetime.now()}, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{func}\nContext: {ctxstr}\n",
+            system=f"You are an AI assistant named GateKeeper, The current date is {datetime.now()}, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{funclist}\nContext: {ctxstr}\n",
             temperature=0.1,
             top_p=0.1,
             min_p=0.05,
@@ -97,7 +110,7 @@ def GateKeep(input, ip, depth=0, stream=False):
             "Input: " + input,
             mem=[],
             modelname="Output:\n<startfunc>\n[{",
-            system=f"You are an AI assistant named GateKeeper, The current date is {datetime.now()}, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{func}",
+            system=f"You are an AI assistant named GateKeeper, The current date is {datetime.now()}, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{funclist}",
             temperature=0.1,
             top_p=0.1,
             min_p=0.05,
@@ -221,6 +234,11 @@ def Util(rsp, ip, depth):
         if Shared_vars.config.enabled_features["imagegeneration"]["enabled"] == False:
             return "Image generation is currently disabled."
         return imagegen(params["prompt"])
+
+    elif rsp["function"] == "searchfile":
+        file = Shared_vars.loadedfile[ip]
+        searchinput = params["query"]
+        return f"<FILE_CHUNK {queryEmbeddings(searchinput, file[0], file[1])[1]} >"
 
     elif rsp["function"] == "runpythoncode":
         if Shared_vars.config.enabled_features["runpythoncode"]["enabled"] == False:

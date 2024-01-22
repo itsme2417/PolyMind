@@ -33,6 +33,8 @@ API_KEY = config.api_key
 
 TABBY = True if config.backend == "tabbyapi" else False
 address = "0.0.0.0" if config.listen else "127.0.0.1"
+loadedfile = {}
+
 
 if (
     config.enabled_features["wolframalpha"]["enabled"]

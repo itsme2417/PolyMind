@@ -204,7 +204,7 @@
                     <div class="input-group">
                         <input type="text" name="input" class="form-control" placeholder="Type your message here..." autocomplete="off">
                         <button type="submit" class="btn btn-primary button-spacing">Send</button>
-                        <button type="button" class="btn btn-secondary button-spacing" id="upload-image-button">Image</button>
+                        <button type="button" class="btn btn-secondary button-spacing" id="upload-image-button">File</button>
                         <div class="loading-spinner spinner-border" role="status">
                             <span class="visually-hidden">Loading...</span>
                           </div>
@@ -263,6 +263,10 @@
                             break;
                         case 'generateimage':
                             shownmsg = appendOutput(loader + '<span><small> Generating an image' + "</small></span>" , false);
+                            ran = true
+                            break;
+                        case 'searchfile':
+                            shownmsg = appendOutput(loader + '<span><small> Performing RAG' + "</small></span>" , false);
                             ran = true
                             break;
                         default:

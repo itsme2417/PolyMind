@@ -182,7 +182,7 @@ def infer(
 
                         content += json.loads(" ".join(line.split(" ")[1:]))["content"]
                         
-                except Exception as e:
+                except Exception:
                     print(traceback.format_exc())
     print("")
     memory.append(
