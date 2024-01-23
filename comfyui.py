@@ -33,10 +33,12 @@ with open(
 
 with open(
     os.path.join(
-        Path(os.path.abspath(__file__)).parent, "comfyui_workflow_turbovision_stablefast.json"
+        Path(os.path.abspath(__file__)).parent,
+        "comfyui_workflow_turbovision_stablefast.json",
     )
 ) as workflow:
     prompt_text_turbovision_stablefast = json.load(workflow)
+
 
 def queue_prompt(prompt, server_address):
     p = {"prompt": prompt, "client_id": client_id}

@@ -155,8 +155,8 @@ def infer(
                         ]
 
                     content += json.loads(" ".join(line.split(" ")[1:]))["choices"][0][
-                            "text"
-                        ]
+                        "text"
+                    ]
 
             else:
                 try:
@@ -181,7 +181,7 @@ def infer(
                             yield json.loads(" ".join(line.split(" ")[1:]))["content"]
 
                         content += json.loads(" ".join(line.split(" ")[1:]))["content"]
-                        
+
                 except Exception:
                     print(traceback.format_exc())
     print("")
@@ -190,4 +190,3 @@ def infer(
     )
 
     yield [content, memory, tokenize(prompt)["length"]]
-

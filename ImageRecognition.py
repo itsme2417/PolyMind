@@ -87,6 +87,7 @@ def get_position(bbox, width, height):  # Thanks mixtral, works pretty good
     else:
         return "unknown position"
 
+
 def find_center(bounding_box):
     x_min, y_min = bounding_box[0][0], bounding_box[0][1]
     x_max, y_max = bounding_box[2][0], bounding_box[2][1]
@@ -95,6 +96,7 @@ def find_center(bounding_box):
     center_y = (y_min + y_max) / 2
 
     return (center_x, center_y)
+
 
 def remove_duplicates(data):  # ft. airoboros-l2-70b
     """

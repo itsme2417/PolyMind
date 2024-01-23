@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify,  Response
+from flask import Flask, render_template, request, jsonify, Response
 from GateKeeper import GateKeep, infer
 from Shared import Adapters
 from datetime import datetime
@@ -8,6 +8,7 @@ import base64
 import time
 import json
 from PIL import Image
+
 if Shared_vars.config.enabled_features["file_input"]["enabled"]:
     from FileHandler import handleFile
 if Shared_vars.config.enabled_features["image_input"]["enabled"]:
@@ -39,26 +40,29 @@ def convert_to_html_code_block(markdown_text):
 
     return html_text
 
+
 chosenfunc = {}
 currenttoken = {}
 
 app = Flask(__name__)
 today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-@app.route('/stream')
+
+@app.route("/stream")
 def stream():
     def generate():
         while True:
-
             yield f"data: {json.dumps(chosenfunc)}\n\n"
             yield f"data: {json.dumps(currenttoken)}\n\n"
             time.sleep(0.5)
-    return Response(generate(), mimetype='text/event-stream')
+
+    return Response(generate(), mimetype="text/event-stream")
+
 
 @app.route("/remove_message", methods=["POST"])
 def remove_message():
     data = request.get_json()
-    index = data.get('index')
+    index = data.get("index")
     try:
         del Shared_vars.vismem[f"{request.remote_addr}"][index]
         del Shared_vars.mem[f"{request.remote_addr}"][index]
@@ -72,7 +76,7 @@ def chat():
     global chosenfunc
     global currenttoken
     try:
-        chosenfunc[f"{request.remote_addr}"]['ip'] = request.remote_addr
+        chosenfunc[f"{request.remote_addr}"]["ip"] = request.remote_addr
         test = Shared_vars.mem[f"{request.remote_addr}"]
         test = Shared_vars.vismem[f"{request.remote_addr}"]
     except KeyError:
@@ -85,14 +89,16 @@ def chat():
         user_input = request.form.get("input")
         answers = Adapters(user_input)
         Kept = ""
-        for y in GateKeep(answers, request.remote_addr, stream = True):
-            if y['type'] == "func":
+        for y in GateKeep(answers, request.remote_addr, stream=True):
+            if y["type"] == "func":
                 try:
-                    chosenfunc[f"{request.remote_addr}"]['func'] = y['result']['function']
+                    chosenfunc[f"{request.remote_addr}"]["func"] = y["result"][
+                        "function"
+                    ]
                 except Exception:
-                    chosenfunc[f"{request.remote_addr}"]['func'] = ""
+                    chosenfunc[f"{request.remote_addr}"]["func"] = ""
             else:
-                Kept = y['result']
+                Kept = y["result"]
         newinp = ""
         imgstr = ""
         genedimage = False
@@ -115,7 +121,12 @@ def chat():
         ):
             newinp += answers.strip() + "\nSYSTEM: " + Kept
         elif "skipment" in Kept:
-            currenttoken[f"{request.remote_addr}"] = {'func': '', 'ip': f"{request.remote_addr}", 'token': Kept.split("{<")[1].replace("<", "&lt;").replace(">", "&gt;") + "</s><s>"}
+            currenttoken[f"{request.remote_addr}"] = {
+                "func": "",
+                "ip": f"{request.remote_addr}",
+                "token": Kept.split("{<")[1].replace("<", "&lt;").replace(">", "&gt;")
+                + "</s><s>",
+            }
             return jsonify(
                 {
                     "output": Kept.split("{<")[1]
@@ -131,7 +142,7 @@ def chat():
             newinp = ""
             newinp += answers.strip()
         today = datetime.now()
-        complete = ["",[]]
+        complete = ["", []]
 
         for tok in infer(
             newinp,
@@ -156,22 +167,55 @@ def chat():
         ):
             if type(tok) != list:
                 complete[0] += tok
-                currenttoken[f"{request.remote_addr}"] = {'func': '', 'ip': f"{request.remote_addr}", 'token': complete[0]}
+                currenttoken[f"{request.remote_addr}"] = {
+                    "func": "",
+                    "ip": f"{request.remote_addr}",
+                    "token": complete[0],
+                }
             else:
                 complete[1] = tok[1]
-                currenttoken[f"{request.remote_addr}"] = {'func': '', 'ip': f"{request.remote_addr}", 'token': convert_to_html_code_block(complete[0]).replace("\n","<br>") + "</s><s>"}
+                currenttoken[f"{request.remote_addr}"] = {
+                    "func": "",
+                    "ip": f"{request.remote_addr}",
+                    "token": convert_to_html_code_block(complete[0]).replace(
+                        "\n", "<br>"
+                    )
+                    + "</s><s>",
+                }
         Shared_vars.mem[f"{request.remote_addr}"] = complete[1]
         Shared_vars.vismem[f"{request.remote_addr}"].append(
-            {"user": user_input, "assistant": convert_to_html_code_block(complete[0]).replace("\n","<br>")}
+            {
+                "user": user_input,
+                "assistant": convert_to_html_code_block(complete[0]).replace(
+                    "\n", "<br>"
+                ),
+            }
         )
 
-        chosenfunc[f"{request.remote_addr}"]['func'] = ''
+        chosenfunc[f"{request.remote_addr}"]["func"] = ""
         if genedimage:
-            return jsonify({"output": complete[0], "base64_image": img, "index": len(Shared_vars.vismem[f"{request.remote_addr}"]) - 1})
+            return jsonify(
+                {
+                    "output": complete[0],
+                    "base64_image": img,
+                    "index": len(Shared_vars.vismem[f"{request.remote_addr}"]) - 1,
+                }
+            )
         elif imgstr != "":
-            return jsonify({"output": complete[0], "base64_image": imgstr, "index": len(Shared_vars.vismem[f"{request.remote_addr}"]) - 1})
+            return jsonify(
+                {
+                    "output": complete[0],
+                    "base64_image": imgstr,
+                    "index": len(Shared_vars.vismem[f"{request.remote_addr}"]) - 1,
+                }
+            )
         else:
-            return jsonify({"output": complete[0], "index": len(Shared_vars.vismem[f"{request.remote_addr}"]) - 1})
+            return jsonify(
+                {
+                    "output": complete[0],
+                    "index": len(Shared_vars.vismem[f"{request.remote_addr}"]) - 1,
+                }
+            )
     else:
         return render_template("chat.html", user_ip=request.remote_addr)
 
@@ -184,14 +228,18 @@ def chat_history():
 @app.route("/upload_file", methods=["POST"])
 def upload_file():
     global chosenfunc
-    if (
-        request.method == "POST"
-        and (Shared_vars.config.enabled_features["image_input"]["enabled"] or Shared_vars.config.enabled_features["file_input"]["enabled"])
+    if request.method == "POST" and (
+        Shared_vars.config.enabled_features["image_input"]["enabled"]
+        or Shared_vars.config.enabled_features["file_input"]["enabled"]
     ):
         imgstr = ""
         file = request.files["file"]
         file_content = request.form["content"]
-        if (".jpg" in file.filename or ".png" in file.filename or ".jpeg" in file.filename) and Shared_vars.config.enabled_features["image_input"]["enabled"] :
+        if (
+            ".jpg" in file.filename
+            or ".png" in file.filename
+            or ".jpeg" in file.filename
+        ) and Shared_vars.config.enabled_features["image_input"]["enabled"]:
             Shared_vars.mem[f"{request.remote_addr}"].append(
                 f"\n{Shared_vars.config.llm_parameters['beginsep']} user: {identify(file_content.split(',')[1])} {Shared_vars.config.llm_parameters['endsep']}"
             )
@@ -205,9 +253,12 @@ def upload_file():
             )
         elif Shared_vars.config.enabled_features["file_input"]["enabled"]:
             if f"{request.remote_addr}" in chosenfunc:
-                chosenfunc[f"{request.remote_addr}"]['func'] = 'loadembed'
+                chosenfunc[f"{request.remote_addr}"]["func"] = "loadembed"
             else:
-                chosenfunc[f"{request.remote_addr}"] = {"func": 'loadembed', "ip": f"{request.remote_addr}"}
+                chosenfunc[f"{request.remote_addr}"] = {
+                    "func": "loadembed",
+                    "ip": f"{request.remote_addr}",
+                }
             chunks = handleFile(file_content)
             if len(chunks) <= 1:
                 Shared_vars.loadedfile[f"{request.remote_addr}"] = {}
@@ -216,7 +267,7 @@ def upload_file():
                 )
             else:
                 Shared_vars.loadedfile[f"{request.remote_addr}"] = chunks
-            chosenfunc[f"{request.remote_addr}"]['func'] = ''
+            chosenfunc[f"{request.remote_addr}"]["func"] = ""
 
         return jsonify({"message": f"{file.filename} uploaded successfully."})
 

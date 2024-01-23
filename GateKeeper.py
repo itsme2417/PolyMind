@@ -7,7 +7,6 @@ import time
 import wolframalpha
 from duckduckgo_search import DDGS
 import nmap
-import traceback
 
 from datetime import datetime
 import subprocess
@@ -15,6 +14,7 @@ import Shared_vars
 from comfyui import imagegen
 from inference import infer
 from scrape import scrape_site
+
 if Shared_vars.config.enabled_features["file_input"]["enabled"]:
     from FileHandler import queryEmbeddings
 import requests
@@ -32,7 +32,7 @@ client = wolframalpha.Client(
     Shared_vars.config.enabled_features["wolframalpha"]["app_id"]
 )
 
-with open(os.path.join(path,"functions.json")) as user_file:
+with open(os.path.join(path, "functions.json")) as user_file:
     global searchfunc
     fcontent = json.loads(user_file.read())
     for x in fcontent:
@@ -47,7 +47,7 @@ with open(os.path.join(path,"functions.json")) as user_file:
         params:
             {params}"""
 
-        if x['name'] == "searchfile":
+        if x["name"] == "searchfile":
             searchfunc = template
             continue
         else:
@@ -79,62 +79,66 @@ def GateKeep(input, ip, depth=0, stream=False):
                 "USER: " + x["user"] + "\n" + "PolyMind: " + x["assistant"],
             )
         content = 'Output:\n<startfunc>\n[{\n  "function": "'
-        content += next(infer(
-            "Input: " + input,
-            mem=[],
-            modelname='Output:\n<startfunc>\n[{\n  "function": "',
-            system=f"You are an AI assistant named GateKeeper, The current date is {datetime.now()}, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{funclist}\nContext: {ctxstr}\n",
-            temperature=0.1,
-            top_p=0.1,
-            min_p=0.05,
-            top_k=40,
-            stopstrings=[
-                "Input: ",
-                "[INST]",
-                "[/INST]",
-                "```",
-                "</s>",
-                "user:",
-                "polymind:",
-                "Polymind:",
-                "<</SYS>>",
-                "[System Message]",
-                "endfunc",
-                "<endfunc>",
-                "}<",
-                "</startfunc>",
-            ],
-            max_tokens=500,
-        ))[0]
+        content += next(
+            infer(
+                "Input: " + input,
+                mem=[],
+                modelname='Output:\n<startfunc>\n[{\n  "function": "',
+                system=f"You are an AI assistant named GateKeeper, The current date is {datetime.now()}, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{funclist}\nContext: {ctxstr}\n",
+                temperature=0.1,
+                top_p=0.1,
+                min_p=0.05,
+                top_k=40,
+                stopstrings=[
+                    "Input: ",
+                    "[INST]",
+                    "[/INST]",
+                    "```",
+                    "</s>",
+                    "user:",
+                    "polymind:",
+                    "Polymind:",
+                    "<</SYS>>",
+                    "[System Message]",
+                    "endfunc",
+                    "<endfunc>",
+                    "}<",
+                    "</startfunc>",
+                ],
+                max_tokens=500,
+            )
+        )[0]
     except TypeError:
         content = 'Output:\n<startfunc>\n[{\n  "function": "'
-        content += next(infer(
-            "Input: " + input,
-            mem=[],
-            modelname='Output:\n<startfunc>\n[{\n  "function": "',
-            system=f"You are an AI assistant named GateKeeper, The current date is {datetime.now()}, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{funclist}",
-            temperature=0.1,
-            top_p=0.1,
-            min_p=0.05,
-            top_k=40,
-            stopstrings=[
-                "Input: ",
-                "[INST]",
-                "[/INST]",
-                "```",
-                "</s>",
-                "user:",
-                "polymind:",
-                "Polymind:",
-                "<</SYS>>",
-                "[System Message]",
-                "endfunc",
-                "<endfunc>",
-                "}<",
-                "</startfunc>",
-            ],
-            max_tokens=500,
-        ))[0]
+        content += next(
+            infer(
+                "Input: " + input,
+                mem=[],
+                modelname='Output:\n<startfunc>\n[{\n  "function": "',
+                system=f"You are an AI assistant named GateKeeper, The current date is {datetime.now()}, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{funclist}",
+                temperature=0.1,
+                top_p=0.1,
+                min_p=0.05,
+                top_k=40,
+                stopstrings=[
+                    "Input: ",
+                    "[INST]",
+                    "[/INST]",
+                    "```",
+                    "</s>",
+                    "user:",
+                    "polymind:",
+                    "Polymind:",
+                    "<</SYS>>",
+                    "[System Message]",
+                    "endfunc",
+                    "<endfunc>",
+                    "}<",
+                    "</startfunc>",
+                ],
+                max_tokens=500,
+            )
+        )[0]
 
     try:
         if "<startfunc>" in content:
@@ -154,19 +158,22 @@ def GateKeep(input, ip, depth=0, stream=False):
             if stream:
                 yield {"result": x, "type": "func"}
 
-            if x['function'] == "searchfile" and Shared_vars.config.enabled_features['file_input']['raw_input']:
-                if 'params' in x:
-                    x['params']['query'] = input 
-                elif 'parameters' in x:
-                    x['parameters']['query'] = input 
+            if (
+                x["function"] == "searchfile"
+                and Shared_vars.config.enabled_features["file_input"]["raw_input"]
+            ):
+                if "params" in x:
+                    x["params"]["query"] = input
+                elif "parameters" in x:
+                    x["parameters"]["query"] = input
                 else:
-                    x['query'] = input
+                    x["query"] = input
 
             run = Util(x, ip, depth)
             if run != "null":
                 result += run
         if stream:
-            result = result if result != "" else "null" 
+            result = result if result != "" else "null"
             result = {"result": result, "type": "result"}
             yield result
         else:
@@ -188,7 +195,11 @@ def Util(rsp, ip, depth):
         .replace("{<", "{")
         .replace("<startfunc>", "")
     )
-    params = rsp['params'] if 'params' in rsp else (rsp['parameters'] if 'parameters' in rsp else rsp)
+    params = (
+        rsp["params"]
+        if "params" in rsp
+        else (rsp["parameters"] if "parameters" in rsp else rsp)
+    )
 
     if rsp["function"] == "acknowledge":
         return "null"
@@ -263,7 +274,7 @@ def Util(rsp, ip, depth):
         checkstring = ""
         ocode = params["code"]
         if "plt.show()" in params["code"]:
-            params["code"] = re.sub('print\s*\(.*\)', '', params["code"])
+            params["code"] = re.sub("print\s*\(.*\)", "", params["code"])
             plotb64 = """import io\nimport base64\nbyt = io.BytesIO()\nplt.savefig(byt, format='png')\nbyt.seek(0)\nprint(f'data:image/png;base64,{base64.b64encode(byt.read()).decode()}',end="")"""
             params["code"] = params["code"].replace("plt.show()", plotb64)
 
@@ -278,11 +289,13 @@ def Util(rsp, ip, depth):
             and depth < Shared_vars.config.enabled_features["runpythoncode"]["depth"]
         ):
             print(f"Current depth: {depth}")
-            return next(GateKeep(
-                f"```{ocode}```\n The above code produced the following error\n{stderr}\n Rewrite the code to solve the error and run the fixed code.",
-                ip,
-                depth + 1,
-            ))
+            return next(
+                GateKeep(
+                    f"```{ocode}```\n The above code produced the following error\n{stderr}\n Rewrite the code to solve the error and run the fixed code.",
+                    ip,
+                    depth + 1,
+                )
+            )
         if "data:image/png;base64," in stdout:
             checkstring = "{<plotimg;" + stdout
             print(
