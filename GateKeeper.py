@@ -155,10 +155,7 @@ def GateKeep(input, ip, depth=0, stream=False):
                 yield {"result": x, "type": "func"}
 
             if x['function'] == "searchfile" and Shared_vars.config.enabled_features['file_input']['raw_input']:
-                if 'params' in x:
-                    x['params']['query'] = input
-                else:
-                    x['query'] = input
+                x['params']['query'] = input if 'params' in x else (x['parameters']['query'] = input if 'parameters' in x else x['query'] = input)
 
             run = Util(x, ip, depth)
             if run != "null":
@@ -186,7 +183,7 @@ def Util(rsp, ip, depth):
         .replace("{<", "{")
         .replace("<startfunc>", "")
     )
-    params = rsp["params"] if "params" in rsp else rsp
+    params = rsp['params'] if 'params' in rsp else (rsp['parameters'] if 'parameters' in rsp else rsp)
 
     if rsp["function"] == "acknowledge":
         return "null"
