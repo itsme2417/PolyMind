@@ -115,6 +115,7 @@ def chat():
         ):
             newinp += answers.strip() + "\nSYSTEM: " + Kept
         elif "skipment" in Kept:
+            currenttoken[f"{request.remote_addr}"] = {'func': '', 'ip': f"{request.remote_addr}", 'token': Kept.split("{<")[1].replace("<", "&lt;").replace(">", "&gt;") + "</s><s>"}
             return jsonify(
                 {
                     "output": Kept.split("{<")[1]
