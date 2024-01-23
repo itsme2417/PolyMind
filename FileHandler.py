@@ -91,7 +91,7 @@ def handleFile(file):
             print("Using cached embeddings.")
         else:
             chunks = split_into_chunks(file, config.enabled_features["file_input"]["chunk_size"])
-
+            print("Creating Embeddings")
             embeddings = model.encode(chunks)
             with open(os.path.join(path, "embeddings_cache", f"{md5sum}.json"), 'w') as f:
                 json.dump({"embeddings": embeddings, "chunks": chunks, "chunk_size": config.enabled_features["file_input"]["chunk_size"]},f, cls=NumpyEncoder)

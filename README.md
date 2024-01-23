@@ -10,7 +10,7 @@ PolyMind is a multimodal, function calling powered LLM webui. It's designed to b
 - A Python interpreter.
 - RAG with semantic search for PDF and miscellaneous text files.
 
-The web parts (HTML, JS, CSS, and Flask) are written entirely by Mixtral.
+90% of the web parts (HTML, JS, CSS, and Flask) are written entirely by Mixtral.
 
 Note: The python interpreter is intentionally delayed by 5 seconds to make it easy to check the code before its ran.
 

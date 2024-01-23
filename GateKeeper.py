@@ -237,7 +237,7 @@ def Util(rsp, ip, depth):
             else:
                 result = "Wolfram Alpha result: " + results
             if checkimage:
-                result += "\nREMINDER: ALWAYS include the provided graph/plot images in the provided format in your explanation if theres any when explaining the results in a short and concise manner."
+                result += "\nREMINDER: ALWAYS include the provided graph/plot images in the provided html URL format in your explanation if theres any when explaining the results in a short and concise manner."
             print(result)
             return result
         except Exception as e:

@@ -230,61 +230,122 @@
         var userIp = "{{ user_ip }}";
         var ran = false;
         var source = new EventSource('/stream');
-        var shownmsg;
-        
+        var shownmsg = false;
+        var currentfunction;
+        var currentmsg;
+        var finished;
+        var pasttoken;
+
         source.onmessage = function(event) {
             // Handle incoming messages
             var jsondata = JSON.parse(event.data)[userIp]
-
+            
             if (userIp == jsondata.ip){
 
-                if (jsondata.func != "" && jsondata.func != "acknowledge" && !ran){
-                var loader = `<svg class="loading-circle" viewBox="0 0 100 100">
-                        <circle class="circle-bg" cx="50" cy="50" r="45"></circle>
-                        <circle class="circle" cx="50" cy="50" r="45"></circle>
-                    </svg>`
-                    
+                if (jsondata.func != "" && jsondata.func != "acknowledge" && (!ran || jsondata.func !=currentfunction)){
+                    var loader = `<svg class="loading-circle" viewBox="0 0 100 100">
+                            <circle class="circle-bg" cx="50" cy="50" r="45"></circle>
+                            <circle class="circle" cx="50" cy="50" r="45"></circle>
+                        </svg>`
+                    currentfunction = jsondata.func    
                     switch (jsondata.func) {
                         case 'internetsearch':
-                            shownmsg = appendOutput(loader + '<span><small> Searching the internet' + "</small></span>" , false);
+                            if (!shownmsg)
+                                shownmsg = appendOutput(loader + '<span><small> Searching the internet' + "</small></span>" , false);
+                            else
+                                shownmsg.innerHTML = loader + '<span><small> Searching the internet' + "</small></span>"
                             ran = true
                             break;
                         case 'portscan':
-                            shownmsg = appendOutput(loader + '<span><small> Scanning for ports' + "</small></span>" , false);
+                            if (!shownmsg)
+                                shownmsg = appendOutput(loader + '<span><small> Scanning for ports' + "</small></span>" , false);
+                            else
+                                shownmsg.innerHTML = loader + '<span><small> Scanning for ports' + "</small></span>"
                             ran = true
                             break;
                         case 'wolframalpha':
-                            shownmsg = appendOutput(loader + '<span><small> Using wolfram|alpha' + "</small></span>" , false);
+                            if (!shownmsg)
+                                shownmsg = appendOutput(loader + '<span><small> Using wolfram|alpha' + "</small></span>" , false);
+                            else
+                                shownmsg.innerHTML = loader + '<span><small> Using wolfram|alpha' + "</small></span>"
                             ran = true
                             break;
                         case 'runpythoncode':
-                            shownmsg = appendOutput(loader + '<span><small> Running code' + "</small></span>" , false);
-                            ran = true
+                            if (!shownmsg)
+                                shownmsg = appendOutput(loader + '<span><small> Running code' + "</small></span>", false);
+                            else
+                                shownmsg.innerHTML = loader + '<span><small> Running code' + "</small></span>";
+                            ran = true;
                             break;
                         case 'generateimage':
-                            shownmsg = appendOutput(loader + '<span><small> Generating an image' + "</small></span>" , false);
-                            ran = true
+                            if (!shownmsg)
+                                shownmsg = appendOutput(loader + '<span><small> Generating an image' + "</small></span>", false);
+                            else
+                                shownmsg.innerHTML = loader + '<span><small> Generating an image' + "</small></span>";
+                            ran = true;
                             break;
                         case 'searchfile':
-                            shownmsg = appendOutput(loader + '<span><small> Performing RAG' + "</small></span>" , false);
-                            ran = true
+                            if (!shownmsg)
+                                shownmsg = appendOutput(loader + '<span><small> Performing RAG' + "</small></span>", false);
+                            else
+                                shownmsg.innerHTML = loader + '<span><small> Performing RAG' + "</small></span>";
+                            ran = true;
                             break;
                         case 'loadembed':
-                            shownmsg = appendOutput(loader + '<span><small> Creating Embeddings' + "</small></span>" , false);
-                            ran = true
+                            if (!shownmsg)
+                                shownmsg = appendOutput(loader + '<span><small> Creating Embeddings' + "</small></span>", false);
+                            else
+                                shownmsg.innerHTML = loader + '<span><small> Creating Embeddings' + "</small></span>";
+                            ran = true;
                             break;
-                        default:
+                            default:
                             break;
+                    }
+                } 
+                else if (jsondata.token != "" && jsondata.token != undefined){
+                    if (!finished){
+                        
+                        if (jsondata.token != pasttoken){
+                            if (jsondata.token.endsWith("</s><s>")){
+                                finished = true
+                                currentmsg.style.display = '';
+                                currentmsg.innerHTML = jsondata.token.replace("</s><s>", "")
+                            }
+                            else{
+                                currentmsg.style.display = '';
+                                currentmsg.innerHTML = jsondata.token.replace("\n", "<br>")
+                            }
+                        }
+                        pasttoken = jsondata.token
                     }
                 }
                 else {
-                    if (!ran && shownmsg)
+                    finished = false
+                    if (!ran && shownmsg){
                         outputDiv.removeChild(shownmsg);
+                        shownmsg = false
+                    }
                 };
             };
         }
+        function convertToHtmlCodeBlock(markdownText) {
+            // Regex pattern to match code blocks
+            var pattern = /```(.*?)```/gs;
 
-        function appendOutput(message, isUserInput) {
+            // Function to convert matched code block to HTML
+            function replacer(match, codeBlock) {
+                var htmlCodeBlock = "<pre><code>" + codeBlock + "</code></pre>";
+                return htmlCodeBlock;
+            }
+
+            // Replace all code blocks in the text
+            var htmlText = markdownText.replace(pattern, replacer);
+
+            return htmlText;
+        }
+
+
+        function appendOutput(message, isUserInput, isHidden = false) {
             let parsedMessage = message
             const p = document.createElement('p');
             if (!isUserInput) {
@@ -292,8 +353,13 @@
                 p.innerHTML = parsedMessage;
                 p.className = 'assistant-output';
             } else {
-                p.textContent = parsedMessage;
+                parsedMessage = convertToHtmlCodeBlock(parsedMessage)
+                parsedMessage = markdownParser(parsedMessage);
+                p.innerHTML = parsedMessage;
                 p.className = 'user-input';
+            }
+            if (isHidden) {
+                p.style.display = 'none'; // Hide the paragraph
             }
             outputDiv.appendChild(p);
             outputDiv.scrollTop = outputDiv.scrollHeight;
@@ -330,38 +396,42 @@
         form.addEventListener('submit', function(event) {
             event.preventDefault();
             const userInput = textArea.value;
-            appendOutput(userInput, true);
-            loadingSpinner.style.display = 'block'; // Show loading spinner
-            fetch('/', {
-                method: 'POST',
-                body: new URLSearchParams({ 'input': userInput }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.output.trim() !== '') {
-                    data.output.split('--newline--').forEach(message => {
-                        message = markdownParser(message);
-                        appendOutput(message, false); // Display assistant response messages
-                        ran = false
-                    });
-                    document.querySelector('textarea[name="input"]').value = '';
-                }
-                loadingSpinner.style.display = 'none'; // Hide loading spinner
-                outputDiv.scrollTop = outputDiv.scrollHeight;
-                adjustOutputContainerHeight();
-
-                if (data.base64_image) {
-                    const base64Image = `${data.base64_image}`;
-                    const imageElement = document.createElement('img');
-                    imageElement.src = base64Image;
-                    imageElement.alt = 'Uploaded image';
-                    imageElement.className = 'uploaded-image';
-                    imageElement.style.border = '1px solid black';
-                    imageElement.style.padding = '5px';
-                    outputDiv.appendChild(imageElement);
+            if (userInput != ""){
+                appendOutput(userInput, true);
+                loadingSpinner.style.display = 'block'; // Show loading spinner
+                document.querySelector('textarea[name="input"]').value = '';
+                currentmsg = appendOutput("", false, true);
+                fetch('/', {
+                    method: 'POST',
+                    body: new URLSearchParams({ 'input': userInput }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.output.trim() !== '') {
+                        data.output.split('--newline--').forEach(message => {
+                            message = markdownParser(message);
+                            //appendOutput(message, false); // Display assistant response messages
+                            ran = false
+                        });
+                        document.querySelector('textarea[name="input"]').value = '';
+                    }
+                    loadingSpinner.style.display = 'none'; // Hide loading spinner
                     outputDiv.scrollTop = outputDiv.scrollHeight;
-                }
-            });
+                    adjustOutputContainerHeight();
+
+                    if (data.base64_image) {
+                        const base64Image = `${data.base64_image}`;
+                        const imageElement = document.createElement('img');
+                        imageElement.src = base64Image;
+                        imageElement.alt = 'Uploaded image';
+                        imageElement.className = 'uploaded-image';
+                        imageElement.style.border = '1px solid black';
+                        imageElement.style.padding = '5px';
+                        outputDiv.appendChild(imageElement);
+                        outputDiv.scrollTop = outputDiv.scrollHeight;
+                    }
+                });
+            }
         });
 
         uploadImageButton.addEventListener('click', function() {

@@ -23,7 +23,7 @@
         "name": "wolframalpha",
         "description": "This uses wolfram alpha to solve the query and returns the result.",
         "params": {
-            "query": "Wolfram alpha query. Remember to specify if a plot or graph is required."
+            "query": "A valid Wolfram alpha formatted query. Remember to specify if a plot or graph is required and has been requested."
         }
     },    
     {

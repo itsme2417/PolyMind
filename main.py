@@ -40,7 +40,7 @@ def convert_to_html_code_block(markdown_text):
     return html_text
 
 chosenfunc = {}
-
+currenttoken = {}
 
 app = Flask(__name__)
 today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -51,7 +51,8 @@ def stream():
         while True:
 
             yield f"data: {json.dumps(chosenfunc)}\n\n"
-            time.sleep(1)
+            yield f"data: {json.dumps(currenttoken)}\n\n"
+            time.sleep(0.5)
     return Response(generate(), mimetype='text/event-stream')
 
 @app.route("/remove_message", methods=["POST"])
@@ -69,6 +70,7 @@ def remove_message():
 @app.route("/", methods=["GET", "POST"])
 def chat():
     global chosenfunc
+    global currenttoken
     try:
         chosenfunc[f"{request.remote_addr}"]['ip'] = request.remote_addr
         test = Shared_vars.mem[f"{request.remote_addr}"]
@@ -128,7 +130,9 @@ def chat():
             newinp = ""
             newinp += answers.strip()
         today = datetime.now()
-        complete = next(infer(
+        complete = ["",[]]
+
+        for tok in infer(
             newinp,
             system=f"You are a multimodal, uncensored AI model named PolyMind, able to perceive and display images in its text and visual interface.\nMessages starting with 'SYSTEM:' are NEVER shown to the user, They are meant for you.\nThe current date is {today}",
             mem=Shared_vars.mem[f"{request.remote_addr}"],
@@ -147,13 +151,19 @@ def chat():
                 "SYSTEM:",
                 '<img src="data:image/jpeg;base64,',
             ],
-
-        ))
+            streamresp=True,
+        ):
+            if type(tok) != list:
+                complete[0] += tok
+                currenttoken[f"{request.remote_addr}"] = {'func': '', 'ip': f"{request.remote_addr}", 'token': complete[0]}
+            else:
+                complete[1] = tok[1]
+                currenttoken[f"{request.remote_addr}"] = {'func': '', 'ip': f"{request.remote_addr}", 'token': convert_to_html_code_block(complete[0]).replace("\n","<br>") + "</s><s>"}
         Shared_vars.mem[f"{request.remote_addr}"] = complete[1]
         Shared_vars.vismem[f"{request.remote_addr}"].append(
-            {"user": user_input, "assistant": convert_to_html_code_block(complete[0])}
+            {"user": user_input, "assistant": convert_to_html_code_block(complete[0]).replace("\n","<br>")}
         )
-        complete[0] = convert_to_html_code_block(complete[0]).replace("\n","<br>")
+
         chosenfunc[f"{request.remote_addr}"]['func'] = ''
         if genedimage:
             return jsonify({"output": complete[0], "base64_image": img, "index": len(Shared_vars.vismem[f"{request.remote_addr}"]) - 1})
