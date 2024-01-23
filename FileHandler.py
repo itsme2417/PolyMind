@@ -53,15 +53,15 @@ def check_cache(file_name):
     return False
 
 def checkformat(file):
-    if "data:text" in file:
-        return base64.b64decode(file.split(";base64,")[1]).decode('utf-8')
-    elif "data:application/pdf" in file:
+    if "data:application/pdf" in file:
         f=io.BytesIO(base64.b64decode(file.split(";base64,")[1]))
         reader = PdfReader(f)
         text = ""
         for x in reader.pages:
             text += x.extract_text()
         return text
+    else:
+        return base64.b64decode(file.split(";base64,")[1]).decode('utf-8')
     return file
 
 def queryEmbeddings(query, embeddings, chunks):
