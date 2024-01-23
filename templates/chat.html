@@ -202,7 +202,7 @@
             <div class="col-12">
                 <form method="post">
                     <div class="input-group">
-                        <input type="text" name="input" class="form-control" placeholder="Type your message here..." autocomplete="off">
+                        <textarea name="input" class="form-control" placeholder="Type your message here..." autocomplete="off"></textarea>
                         <button type="submit" class="btn btn-primary button-spacing">Send</button>
                         <button type="button" class="btn btn-secondary button-spacing" id="upload-image-button">File</button>
                         <div class="loading-spinner spinner-border" role="status">
@@ -301,12 +301,13 @@
         }
 
         window.onload = function() {
+            adjustTextareaHeight()
             fetch('/chat_history')
                 .then(response => response.json())
                 .then(data => {
                     data.forEach(chatItem => {
                             appendOutput(chatItem['user'], true); // Display user input messages
-                            appendOutput(chatItem['assistant'], false); // Display assistant response messages
+                            appendOutput(chatItem['assistant'].replace(/\n/g,"<br>"), false); // Display assistant response messages
 
                     });
                     adjustOutputContainerHeight();
@@ -315,19 +316,21 @@
 
         // Send user input and display the response
         const form = document.querySelector('form');
+        const textArea = document.querySelector('textarea[name="input"]');
         const loadingSpinner = document.querySelector('.loading-spinner');
         const uploadImageButton = document.querySelector('#upload-image-button');
 
+        textArea.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                form.requestSubmit();
+            }
+        });
+
         form.addEventListener('submit', function(event) {
             event.preventDefault();
-            const userInput = document.querySelector('input[name="input"]').value;
-            const messages = userInput.split('\n').filter(message => message.trim() !== '');
-            messages.forEach((message, index) => {
-                appendOutput(message, true); // Display user input messages
-                if (index !== messages.length - 1) {
-                    outputDiv.appendChild(document.createTextNode('--newline--'));
-                }
-            });
+            const userInput = textArea.value;
+            appendOutput(userInput, true);
             loadingSpinner.style.display = 'block'; // Show loading spinner
             fetch('/', {
                 method: 'POST',
@@ -341,7 +344,7 @@
                         appendOutput(message, false); // Display assistant response messages
                         ran = false
                     });
-                    document.querySelector('input[name="input"]').value = '';
+                    document.querySelector('textarea[name="input"]').value = '';
                 }
                 loadingSpinner.style.display = 'none'; // Hide loading spinner
                 outputDiv.scrollTop = outputDiv.scrollHeight;
@@ -412,6 +415,17 @@
             const newHeight = Math.max(messagesCount * messageHeight, 800); // Set a minimum height of 800 pixels
             outputDiv.style.height = `${newHeight}px`;
         }
+        function adjustTextareaHeight() {
+            var sendButton = document.querySelector('.btn-primary');
+            var fileButton = document.querySelector('.btn-secondary');
+            var textarea = document.querySelector('textarea[name="input"]');
+
+            if (sendButton && fileButton && textarea) {
+                var buttonHeight = Math.max(sendButton.offsetHeight, fileButton.offsetHeight);
+                textarea.style.height = buttonHeight + 'px';
+            }
+        }
+
     </script>
     <script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.min.js')}}"></script>
 

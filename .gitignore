@@ -168,3 +168,4 @@ node_modules/.package-lock.json
 node_modules/
 memory.json
 embeddings_cache/*
+!embeddings_cache/cached_embeddings_go_here

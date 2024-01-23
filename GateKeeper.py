@@ -78,11 +78,11 @@ def GateKeep(input, ip, depth=0, stream=False):
                 "",
                 "USER: " + x["user"] + "\n" + "PolyMind: " + x["assistant"],
             )
-        content = "<startfunc>\n[{"
+        content = 'Output:\n<startfunc>\n[{\n  "function": "'
         content += next(infer(
             "Input: " + input,
             mem=[],
-            modelname="Output:\n<startfunc>\n[{",
+            modelname='Output:\n<startfunc>\n[{\n  "function": "',
             system=f"You are an AI assistant named GateKeeper, The current date is {datetime.now()}, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{funclist}\nContext: {ctxstr}\n",
             temperature=0.1,
             top_p=0.1,
@@ -107,11 +107,11 @@ def GateKeep(input, ip, depth=0, stream=False):
             max_tokens=500,
         ))[0]
     except TypeError:
-        content = "<startfunc>\n{"
+        content = 'Output:\n<startfunc>\n[{\n  "function": "'
         content += next(infer(
             "Input: " + input,
             mem=[],
-            modelname="Output:\n<startfunc>\n[{",
+            modelname='Output:\n<startfunc>\n[{\n  "function": "',
             system=f"You are an AI assistant named GateKeeper, The current date is {datetime.now()}, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{funclist}",
             temperature=0.1,
             top_p=0.1,

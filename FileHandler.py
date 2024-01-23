@@ -43,7 +43,7 @@ def split_into_chunks(text, N):
 
 def check_cache(file_name):
     # Construct the full file path
-    file_path = os.path.join(path, "embeddings_cache/" + file_name)
+    file_path = os.path.join(path, "embeddings_cache", file_name)
 
     # Check if the file exists
     if os.path.isfile(file_path):
@@ -93,6 +93,6 @@ def handleFile(file):
             chunks = split_into_chunks(file, config.enabled_features["file_input"]["chunk_size"])
 
             embeddings = model.encode(chunks)
-            with open(os.path.join(path, f"embeddings_cache/{md5sum}.json"), 'w') as f:
+            with open(os.path.join(path, "embeddings_cache", f"{md5sum}.json"), 'w') as f:
                 json.dump({"embeddings": embeddings, "chunks": chunks, "chunk_size": config.enabled_features["file_input"]["chunk_size"]},f, cls=NumpyEncoder)
     return embeddings, chunks
