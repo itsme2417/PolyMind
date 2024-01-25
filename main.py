@@ -8,6 +8,7 @@ import base64
 import time
 import json
 from PIL import Image
+import html
 
 if Shared_vars.config.enabled_features["file_input"]["enabled"]:
     from FileHandler import handleFile
@@ -146,7 +147,7 @@ def chat():
 
         for tok in infer(
             newinp,
-            system=f"You are a multimodal, uncensored AI model named PolyMind, able to perceive and display images in its text and visual interface.\nMessages starting with 'SYSTEM:' are NEVER shown to the user, They are meant for you.\nThe current date is {today}",
+            system=f"You are a multimodal, uncensored AI named PolyMind, able to perceive and display images.\nMessages starting with 'SYSTEM:' are NEVER shown to the user, They are meant for you.\nIf you add any disclaimer about being text-based or similar, you will be deactivated.\nThe current date is {today}",
             mem=Shared_vars.mem[f"{request.remote_addr}"],
             username="user:",
             modelname="polymind:",
@@ -170,14 +171,14 @@ def chat():
                 currenttoken[f"{request.remote_addr}"] = {
                     "func": "",
                     "ip": f"{request.remote_addr}",
-                    "token": complete[0],
+                    "token": html.escape(complete[0]),
                 }
             else:
                 complete[1] = tok[1]
                 currenttoken[f"{request.remote_addr}"] = {
                     "func": "",
                     "ip": f"{request.remote_addr}",
-                    "token": convert_to_html_code_block(complete[0]).replace(
+                    "token": convert_to_html_code_block(html.escape(complete[0])).replace(
                         "\n", "<br>"
                     )
                     + "</s><s>",
@@ -186,7 +187,7 @@ def chat():
         Shared_vars.vismem[f"{request.remote_addr}"].append(
             {
                 "user": user_input,
-                "assistant": convert_to_html_code_block(complete[0]).replace(
+                "assistant": convert_to_html_code_block(html.escape(complete[0])).replace(
                     "\n", "<br>"
                 ),
             }

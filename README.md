@@ -37,7 +37,7 @@ There are no "commands" or similar as everything is done via function calling. C
 
 The application's configuration is stored in the `config.json` file. Here's a description of each option:
 
-- `Backend`: The backend that runs the LLM. Options: `tabbyapi` or `llama.cpp`. (Currently only TabbyAPI is fully supported.)
+- `Backend`: The backend that runs the LLM. Options: `tabbyapi` or `llama.cpp`.
 - `HOST` and `PORT`: The IP address and port of the backend.
 - `admin_ip`: The IP address of the admin/trusted user. Necessary to use the Python interpreter and change settings.
 - `listen`: Whether to allow other hosts in the network to access the webui.

@@ -96,9 +96,12 @@ def queryEmbeddings(query, embeddings, chunks):
 
 def handleFile(file):
     md5sum = hashlib.md5(file.encode("utf-8")).hexdigest()
+    print(f"File hash: {md5sum}")
     file = checkformat(file)
-
-    if tokenize(file)[0] <= config.enabled_features["file_input"]["chunk_size"]:
+    currlen = tokenize(file)[0]
+    print(f"Current length: {currlen}")
+    
+    if currlen <= config.enabled_features["file_input"]["chunk_size"]:
         return [file]
     else:
         cached = check_cache(f"{md5sum}.json")
@@ -113,6 +116,7 @@ def handleFile(file):
             embeddings = cached["embeddings"]
             print("Using cached embeddings.")
         else:
+            print("Splitting into chunks")
             chunks = split_into_chunks(
                 file, config.enabled_features["file_input"]["chunk_size"]
             )

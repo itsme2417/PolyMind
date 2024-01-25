@@ -272,6 +272,7 @@ def Util(rsp, ip, depth):
             return "null"
         time.sleep(5)
         checkstring = ""
+        params["code"] = "import warnings\nwarnings.filterwarnings('ignore')\n" + params['code']
         ocode = params["code"]
         if "plt.show()" in params["code"]:
             params["code"] = re.sub("print\s*\(.*\)", "", params["code"])
@@ -283,7 +284,10 @@ def Util(rsp, ip, depth):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
+
         stdout, stderr = output.stdout.decode(), output.stderr.decode()
+        if output.returncode == 0 and "yfinance" in params['code']:
+            stderr = ""
         if (
             stderr != ""
             and depth < Shared_vars.config.enabled_features["runpythoncode"]["depth"]

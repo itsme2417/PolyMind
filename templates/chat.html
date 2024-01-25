@@ -353,9 +353,9 @@
                 p.innerHTML = parsedMessage;
                 p.className = 'assistant-output';
             } else {
-                parsedMessage = convertToHtmlCodeBlock(parsedMessage)
-                parsedMessage = markdownParser(parsedMessage);
-                p.innerHTML = parsedMessage;
+                //parsedMessage = convertToHtmlCodeBlock(parsedMessage)
+                //parsedMessage = markdownParser(parsedMessage);
+                p.innerText = parsedMessage;
                 p.className = 'user-input';
             }
             if (isHidden) {

@@ -92,7 +92,7 @@ def infer(
             + "".join(memory)
             + f"\n{beginsep} {username} {prmpt} {endsep} {modelname}"
         )
-
+    stopstrings += ["</s>", "<</SYS>>", "[Inst]", "[/INST]", Shared_vars.config.llm_parameters["bsysep"], Shared_vars.config.llm_parameters["esysep"], Shared_vars.config.llm_parameters["beginsep"], Shared_vars.config.llm_parameters["endsep"]]
     payload = {
         "prompt": prompt,
         "model": "gpt-3.5-turbo-instruct",
@@ -105,7 +105,7 @@ def infer(
         ),  # Was acting weird without this
         "top_k": top_k,
         "top_p": top_p,
-        "stop": [beginsep] + stopstrings + ["</s>", "<</SYS>>", "[INST]", "[/INST]"],
+        "stop": [beginsep] +  stopstrings,
         "temperature": temperature,
     }
 
