@@ -33,7 +33,7 @@ def tokenize(input):
         "content": input,
     }
     request = requests.post(
-        API_ENDPOINT_URI.replace("completions", "token/encode") if TABBY else API_ENDPOINT_URI.replace("completion", "tokenize"),
+        API_ENDPOINT_URI.replace("completions", "token/encode") if Shared_vars.TABBY else API_ENDPOINT_URI.replace("completion", "tokenize"),
         headers={
             "Accept": "application/json",
             "Content-Type": "application/json",
@@ -42,7 +42,7 @@ def tokenize(input):
         json=payload,
         timeout=360,
     )
-    return request.json()["length"] if TABBY else len(request.json()["tokens"]), request.json()["tokens"]
+    return request.json()["length"] if Shared_vars.TABBY else len(request.json()["tokens"]), request.json()["tokens"]
 
 
 def decode(input):
@@ -53,7 +53,7 @@ def decode(input):
         "tokens": input,
     }
     request = requests.post(
-        API_ENDPOINT_URI.replace("completions", "token/decode") if TABBY else API_ENDPOINT_URI.replace("completion", "detokenize"),
+        API_ENDPOINT_URI.replace("completions", "token/decode") if Shared_vars.TABBY else API_ENDPOINT_URI.replace("completion", "detokenize"),
         headers={
             "Accept": "application/json",
             "Content-Type": "application/json",
@@ -62,7 +62,7 @@ def decode(input):
         json=payload,
         timeout=360,
     )
-    return request.json()["text"] if TABBY else request.json()["content"]
+    return request.json()["text"] if Shared_vars.TABBY else request.json()["content"]
 
 
 def shorten_text(text, max_tokens):
