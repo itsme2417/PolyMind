@@ -56,7 +56,7 @@ The application's configuration is stored in the `config.json` file. Here's a de
 - `imagegeneration/checkpoint_name`: Specifies the filename of the SD checkpoint for comfyui.
 - `file_input/chunk_size`: Specifies the token count per segment for text chunking. Equivalent to amount of context used per RAG message.
 - `file_input/raw_input`: If set to true, the user's message is used as the query for the semantic search, otherwise an LLM generated query is used.
-
+- `Plugins`: A list containing the name of enabled plugins, Names should match the folder names in `plugins` and `module_name` from their `manifest.json`. 
 ## Donations
 
 Patreon: https://www.patreon.com/llama990
