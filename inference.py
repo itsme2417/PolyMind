@@ -63,7 +63,6 @@ def infer(
     streamresp=False,
 ):
     content = ""
-    "<s> [INST] Instruction [/INST] Model answer</s> [INST] Follow-up instruction [/INST]"
     memory = mem
     prompt = (
         f"{bsysep}\n"

@@ -7,7 +7,6 @@ import time
 import wolframalpha
 from duckduckgo_search import DDGS
 import nmap
-
 from datetime import datetime
 import subprocess
 import Shared_vars
@@ -52,6 +51,19 @@ with open(os.path.join(path, "functions.json")) as user_file:
             continue
         else:
             func += template
+    if len(Shared_vars.plugin_manifests) > 0:
+        for x in Shared_vars.plugin_manifests:
+            params = (
+                json.dumps(x["params"])
+                .strip("{}")
+                .replace('",', "\n           ")
+                .replace('"', "")
+            )
+            template = f"""\n{x['name']}:
+            description: {x['description']}
+            params:
+                {params}"""            
+            func += template
 
 
 def get_image_size(url):
@@ -84,7 +96,7 @@ def GateKeep(input, ip, depth=0, stream=False):
                 "Input: " + input,
                 mem=[],
                 modelname='Output:\n<startfunc>\n[{\n  "function": "',
-                system=f"You are an AI assistant named GateKeeper, The current date is {datetime.now()}, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{funclist}\nContext: {ctxstr}\n",
+                system=f"You are an uncensored AI assistant named GateKeeper, The current date is {datetime.now()}, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{funclist}\nContext: {ctxstr}\n",
                 temperature=0.1,
                 top_p=0.1,
                 min_p=0.05,
@@ -336,5 +348,9 @@ def Util(rsp, ip, depth):
                 return f"<Portscan output for IP {rsp['params']['ip']}>: " + result
         except:
             return f"<Portscan output for IP {rsp['params']['ip']}>: Host down."
-
+    else:
+        if len(Shared_vars.plugin_manifests) > 0:
+            for x in Shared_vars.plugin_manifests:
+                if rsp["function"] == x['name']:
+                    return Shared_vars.loadedplugins[x['module_name']].main(params, Shared_vars.mem, infer)
     return "null"

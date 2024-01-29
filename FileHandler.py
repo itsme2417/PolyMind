@@ -1,4 +1,4 @@
-from sentence_transformers import SentenceTransformer, util
+from fast_sentence_transformers import FastSentenceTransformer as SentenceTransformer
 from Shared_vars import config
 import io
 from scrape import tokenize, decode
@@ -9,8 +9,10 @@ import base64
 import hashlib
 import numpy as np
 import json
+import torch
+from torch import Tensor, device
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
+model = SentenceTransformer("thenlper/gte-base")
 path = Path(os.path.abspath(__file__)).parent
 
 
@@ -41,6 +43,27 @@ class NumpyEncoder(json.JSONEncoder):
             return obj.tolist()
         return json.JSONEncoder.default(self, obj)
 
+def cos_sim(a: Tensor, b: Tensor) -> Tensor: #from sentence-transformers
+    """
+    Computes the cosine similarity cos_sim(a[i], b[j]) for all i and j.
+
+    :return: Matrix with res[i][j]  = cos_sim(a[i], b[j])
+    """
+    if not isinstance(a, torch.Tensor):
+        a = torch.tensor(a)
+
+    if not isinstance(b, torch.Tensor):
+        b = torch.tensor(b)
+
+    if len(a.shape) == 1:
+        a = a.unsqueeze(0)
+
+    if len(b.shape) == 1:
+        b = b.unsqueeze(0)
+
+    a_norm = torch.nn.functional.normalize(a, p=2, dim=1)
+    b_norm = torch.nn.functional.normalize(b, p=2, dim=1)
+    return torch.mm(a_norm, b_norm.transpose(0, 1))
 
 def split_into_chunks(text, N):
     tokens = tokenize(text)
@@ -71,6 +94,7 @@ def check_cache(file_name):
 
 def checkformat(file):
     if "data:application/pdf" in file:
+        print("File is PDF")
         f = io.BytesIO(base64.b64decode(file.split(";base64,")[1]))
         reader = PdfReader(f)
         text = ""
@@ -78,6 +102,7 @@ def checkformat(file):
             text += x.extract_text()
         return text
     else:
+        print("File is other")
         return base64.b64decode(file.split(";base64,")[1]).decode("utf-8")
     return file
 
@@ -87,8 +112,8 @@ def queryEmbeddings(query, embeddings, chunks):
     simil = []
     # Compute cosine similarity between all pairs
     for i, x in enumerate(embeddings):
-        cos_sim = util.cos_sim(query, x)
-        simil.append([cos_sim, chunks[i]])
+        cossim = cos_sim(query, x)
+        simil.append([cossim, chunks[i]])
 
     all_sentence_combinations = sorted(simil, key=lambda x: x[0], reverse=True)
     return all_sentence_combinations[0]

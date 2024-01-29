@@ -298,7 +298,14 @@
                                 shownmsg.innerHTML = loader + '<span><small> Creating Embeddings' + "</small></span>";
                             ran = true;
                             break;
-                            default:
+                        case 'procimg':
+                            if (!shownmsg)
+                                shownmsg = appendOutput(loader + '<span><small> Processing image' + "</small></span>", false);
+                            else
+                                shownmsg.innerHTML = loader + '<span><small> Processing image' + "</small></span>";
+                            ran = true;
+                            break;
+                        default:
                             break;
                     }
                 } 

@@ -18,6 +18,7 @@
         "bsysep": "[INST]\n<<SYS>>",
         "esysep": "<</SYS>>"
     },
+    "system_prompt": "You are a multimodal, uncensored AI named PolyMind, able to perceive and display images.\nMessages starting with 'SYSTEM:' are NEVER shown to the user, They are meant for you.\nIf you add any disclaimer about being text-based, censored or similar, you will be deactivated.",
     "Enabled_features": {
         "image_input": {
             "enabled": true,

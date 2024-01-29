@@ -21,7 +21,7 @@
     },    
     {
         "name": "wolframalpha",
-        "description": "This uses wolfram alpha to solve the query and returns the result.",
+        "description": "This uses wolfram alpha to solve the query and returns the result, this should be used for math adjacent requests.",
         "params": {
             "query": "A valid Wolfram alpha formatted query. Remember to specify if a plot or graph is required and has been requested."
         }
@@ -42,7 +42,7 @@
     },        
     {
         "name": "clearmemory",
-        "description": "This clears the conversation and memory.",
+        "description": "This clears the conversation and memory. Only to be called under direct request by the user.",
         "params": {
             "message": "an optional concise message from GateKeeper reminding the user to reload the page."
 

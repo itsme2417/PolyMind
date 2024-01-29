@@ -1,15 +1,16 @@
 from pathlib import Path
 import os
 import json
+import importlib.util
 
 mem = {}
 vismem = {}
 blipcache = {}
 
+script_dir = Path(os.path.abspath(__file__)).parent
 
 class Config:
     def __init__(self):
-        script_dir = Path(os.path.abspath(__file__)).parent
 
         with open(os.path.join(script_dir, "config.json")) as config_file:
             config = json.load(config_file)
@@ -21,7 +22,13 @@ class Config:
             if config["HOST"].endswith("/")
             else config["HOST"]
         )
+        try:
+            self.plugins = config["Plugins"]
+        except KeyError:
+            print("Plugins disabled.")
+            self.plugins = []
         self.port = config["PORT"]
+        self.system = config['system_prompt']
         self.enabled_features = config["Enabled_features"]
         self.adminip = config["admin_ip"]
         self.api_key = config["api_key"]
@@ -58,3 +65,37 @@ if config.api_key == "your-tabby-api-key" or config.api_key == "":
     print(
         "\033[93m WARN: You have not set an API key, You probably want to set this if using TabbyAPI. \033[0m"
     )
+
+
+def import_plugin(plugin_directory, plugin_name):
+    main_path = os.path.join(plugin_directory, plugin_name, 'main.py')
+    spec = importlib.util.spec_from_file_location(f"{plugin_name}.main", main_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def load_plugins():
+    config_plugins = config.plugins
+    plugdict = {}
+    if len(config_plugins) < 1:
+        return [], {}
+    manifests = []
+
+    for folder_name in os.listdir(os.path.join(script_dir, 'plugins')):
+        if folder_name in config_plugins:
+            print(f"loading plugin: {folder_name}")
+            manifest_path = os.path.join(script_dir, 'plugins', folder_name, 'manifest.json')
+            try:
+                with open(manifest_path, 'r') as file:
+                    loadedjson = json.load(file)
+                    manifests.append(loadedjson)
+                    plugdict[loadedjson['module_name']] = import_plugin(os.path.join(script_dir, "plugins"), loadedjson['module_name'])
+            except FileNotFoundError:
+                print(f"Manifest file not found for plugin: {folder_name}")
+            except json.JSONDecodeError:
+                print(f"Error decoding JSON from manifest of plugin: {folder_name}")
+
+    return manifests, plugdict
+
+plugin_manifests, loadedplugins = load_plugins()

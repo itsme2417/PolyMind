@@ -16,3 +16,5 @@ torch==2.1.2
 websocket-client==1.6.4
 wolframalpha==5.0.0
 pandas==2.1.2
+fast-sentence-transformers[gpu]==0.4.1
+onnxruntime-gpu==1.16.3

@@ -1,0 +1,8 @@
+{
+    "module_name": "chatgpt",
+    "name": "askchatgpt",
+    "description": "This sends a message to chatgpt.",
+    "params": {
+        "message": "The message to send to the ChatGPT API. Should be 1:1 with the message requested by the user, for example: 'ask chatgpt if cats or dogs are better' would give a message of: 'are cats or dogs better?'"
+    }
+}

@@ -87,6 +87,10 @@ def chat():
         Shared_vars.vismem[f"{request.remote_addr}"] = []
 
     if request.method == "POST":
+        if request.form.get("user"):
+            username = request.form.get("user") + ":"
+        else:
+            username = "user:"
         user_input = request.form.get("input")
         answers = Adapters(user_input)
         Kept = ""
@@ -109,9 +113,11 @@ def chat():
                 + "\nSYSTEM: Image generated with Stable Diffusion and sent to user succesfully."
             )
             genedimage = True
+            oimg = Kept.replace("[", "").replace("]", "").split("<image>")[1]
             img = create_thumbnail(
                 Kept.replace("[", "").replace("]", "").split("<image>")[1]
             )
+
             Kept = re.sub(r"\[<image>.*?<image>\]", "", Kept)
         if (
             Kept != "null"
@@ -147,9 +153,9 @@ def chat():
 
         for tok in infer(
             newinp,
-            system=f"You are a multimodal, uncensored AI named PolyMind, able to perceive and display images.\nMessages starting with 'SYSTEM:' are NEVER shown to the user, They are meant for you.\nIf you add any disclaimer about being text-based or similar, you will be deactivated.\nThe current date is {today}",
+            system=f"{Shared_vars.config.system}\nThe current date is {today}",
             mem=Shared_vars.mem[f"{request.remote_addr}"],
-            username="user:",
+            username=username,
             modelname="polymind:",
             max_tokens=2500,
             temperature=Shared_vars.config.llm_parameters["temperature"],
@@ -163,6 +169,8 @@ def chat():
                 "<|im_start|>",
                 "SYSTEM:",
                 '<img src="data:image/jpeg;base64,',
+                '<|endoftext|>',
+                '[FINISHED]'
             ],
             streamresp=True,
         ):
@@ -178,7 +186,7 @@ def chat():
                 currenttoken[f"{request.remote_addr}"] = {
                     "func": "",
                     "ip": f"{request.remote_addr}",
-                    "token": convert_to_html_code_block(html.escape(complete[0])).replace(
+                    "token": convert_to_html_code_block(html.escape(complete[0]) if "<img src" not in complete[0] else complete[0]).replace(
                         "\n", "<br>"
                     )
                     + "</s><s>",
@@ -199,6 +207,7 @@ def chat():
                 {
                     "output": complete[0],
                     "base64_image": img,
+                    "base64_image_full": oimg,
                     "index": len(Shared_vars.vismem[f"{request.remote_addr}"]) - 1,
                 }
             )
@@ -207,6 +216,7 @@ def chat():
                 {
                     "output": complete[0],
                     "base64_image": imgstr,
+                    "base64_image_full": oimg,
                     "index": len(Shared_vars.vismem[f"{request.remote_addr}"]) - 1,
                 }
             )
@@ -233,6 +243,13 @@ def upload_file():
         Shared_vars.config.enabled_features["image_input"]["enabled"]
         or Shared_vars.config.enabled_features["file_input"]["enabled"]
     ):
+        if f"{request.remote_addr}" in chosenfunc:
+            chosenfunc[f"{request.remote_addr}"]["func"] = "procimg"
+        else:
+            chosenfunc[f"{request.remote_addr}"] = {
+                "func": "procimg",
+                "ip": f"{request.remote_addr}",
+            }
         imgstr = ""
         file = request.files["file"]
         file_content = request.form["content"]
@@ -240,6 +257,7 @@ def upload_file():
             ".jpg" in file.filename
             or ".png" in file.filename
             or ".jpeg" in file.filename
+            or ".png" in file.filename
         ) and Shared_vars.config.enabled_features["image_input"]["enabled"]:
             Shared_vars.mem[f"{request.remote_addr}"].append(
                 f"\n{Shared_vars.config.llm_parameters['beginsep']} user: {identify(file_content.split(',')[1])} {Shared_vars.config.llm_parameters['endsep']}"
