@@ -9,6 +9,7 @@ PolyMind is a multimodal, function calling powered LLM webui. It's designed to b
 - Wolfram Alpha integration.
 - A Python interpreter.
 - RAG with semantic search for PDF and miscellaneous text files.
+- Plugin system to easily add extra functions that are able to be called by the model.
 
 90% of the web parts (HTML, JS, CSS, and Flask) are written entirely by Mixtral.
 
@@ -33,6 +34,10 @@ To use PolyMind, run the following command in the project directory:
 python main.py
 ```
 There are no "commands" or similar as everything is done via function calling. Clearing the context can be done by asking the model to do so, along with the Enabled features which can be disabled or enabled temporarily in the same way.
+
+For plugins check [The plugins directory](https://github.com/itsme2417/PolyMind/tree/main/plugins)
+
+For an example on how to use polymind as a basic API Server check [Examples](https://github.com/itsme2417/PolyMind/tree/main/examples/discord_bot)
 
 ## Configuration
 
