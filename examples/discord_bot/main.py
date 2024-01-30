@@ -74,7 +74,8 @@ class discordclient(discord.Client):
             print(f'Message from {message.author}: {content} with {message.attachments} in {guild}')
             self.message_queue.append(message)
             if not self.is_processing:
-                await self.process_messages()
+                async with message.channel.typing():
+                    await self.process_messages()
 
     async def process_messages(self):
         self.is_processing = True
@@ -85,7 +86,7 @@ class discordclient(discord.Client):
 
             print("Response: " + response['output'])
             if "base64_image" in response:
-                file = discord.File(io.BytesIO(base64.b64decode(response['base64_image_full"'])), filename='img.png')
+                file = discord.File(io.BytesIO(base64.b64decode(response['base64_image_full'])), filename='img.png')
                 await message.reply(response['output'], file=file)
             else:
                 await message.reply(response['output'])
