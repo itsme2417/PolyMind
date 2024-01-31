@@ -98,6 +98,7 @@ def infer(
         "max_tokens": max_tokens,
         "n_predict": max_tokens,
         "min_p": min_p,
+        "repetition_penalty": Shared_vars.config.llm_parameters["repetition_penalty"] if "repetition_penalty" in Shared_vars.config.llm_parameters else 1.0,
         "stream": True,
         "seed": random.randint(
             1000002406736107, 3778562406736107

@@ -49,6 +49,7 @@ def load_config():
         return None
 
 config = load_config()
+MAX_MESSAGE_LENGTH = 2000
 
 class discordclient(discord.Client):
     def __init__(self, *args, **kwargs):
@@ -89,9 +90,13 @@ class discordclient(discord.Client):
                 file = discord.File(io.BytesIO(base64.b64decode(response['base64_image_full'])), filename='img.png')
                 await message.reply(response['output'], file=file)
             else:
-                await message.reply(response['output'])
+                # Split the response into chunks of MAX_MESSAGE_LENGTH characters or less
+                for i in range(0, len(response['output']), MAX_MESSAGE_LENGTH):
+                    chunk = response['output'][i:i + MAX_MESSAGE_LENGTH]
+                    await message.reply(chunk)
 
         self.is_processing = False
+
 
 client = discordclient(intents=discord.Intents.default())
 client.run(config['token'])

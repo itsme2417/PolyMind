@@ -46,7 +46,7 @@ chosenfunc = {}
 currenttoken = {}
 
 app = Flask(__name__)
-today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+today = datetime.utcnow().strftime("%Y-%m-%d %H:%M")
 
 
 @app.route("/stream")
@@ -179,7 +179,7 @@ def chat():
                 currenttoken[f"{request.remote_addr}"] = {
                     "func": "",
                     "ip": f"{request.remote_addr}",
-                    "token": html.escape(complete[0]),
+                    "token": html.escape(complete[0]).replace("\n", "<br>"),
                 }
             else:
                 complete[1] = tok[1]
@@ -292,4 +292,7 @@ def upload_file():
 
 
 if __name__ == "__main__":
-    app.run(host=Shared_vars.address)
+    port = 5000
+    if Shared_vars.config.port == port:
+        port = 8750
+    app.run(host=Shared_vars.address, port=port)
