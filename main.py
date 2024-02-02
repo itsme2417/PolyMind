@@ -144,11 +144,12 @@ def chat():
         if "{<plotimg;" in Kept:
             newinp = answers.strip()
             newinp += Kept.split("{<plotimg;")[0]
+            oimg = Kept.split("{<plotimg;")[1]
             imgstr = Kept.split("{<plotimg;")[1]
         if Kept == "null":
             newinp = ""
             newinp += answers.strip()
-        today = datetime.now()
+
         complete = ["", []]
 
         for tok in infer(
