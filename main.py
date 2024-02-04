@@ -174,6 +174,7 @@ def chat():
                 '[FINISHED]'
             ],
             streamresp=True,
+            few_shot=Shared_vars.config.llm_parameters['fewshot']
         ):
             if type(tok) != list:
                 complete[0] += tok

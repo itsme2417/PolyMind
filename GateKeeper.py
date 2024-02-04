@@ -119,7 +119,9 @@ def GateKeep(input, ip, depth=0, stream=False):
                     "</startfunc>",
                 ],
                 max_tokens=500,
-                reppenalty=1.0
+                reppenalty=1.0,
+                max_temp=0,
+                min_temp=0
             )
         )[0]
     except TypeError:
@@ -151,7 +153,9 @@ def GateKeep(input, ip, depth=0, stream=False):
                     "</startfunc>"
                 ],
                 max_tokens=500,
-                reppenalty=1.0
+                reppenalty=1.0,
+                max_temp=0,
+                min_temp=0
             )
         )[0]
 

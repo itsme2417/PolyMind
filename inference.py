@@ -62,6 +62,8 @@ def infer(
     min_p=0.0,
     streamresp=False,
     reppenalty=Shared_vars.config.llm_parameters["repetition_penalty"] if "repetition_penalty" in Shared_vars.config.llm_parameters else 1.0,
+    max_temp=Shared_vars.config.llm_parameters["max_temp"] if "max_temp" in Shared_vars.config.llm_parameters else 0,
+    min_temp=Shared_vars.config.llm_parameters["min_temp"] if "min_temp" in Shared_vars.config.llm_parameters else 0
 ):
     content = ""
     memory = mem
@@ -109,7 +111,9 @@ def infer(
         "stop": [beginsep] +  stopstrings,
         "temperature": temperature,
     }
-
+    if min_temp != 0 and max_temp != 0:
+        payload["min_temp"] = min_temp
+        payload["max_temp"] = max_temp
     request = requests.post(
         API_ENDPOINT_URI,
         headers={
