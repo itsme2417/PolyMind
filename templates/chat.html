@@ -428,14 +428,27 @@
 
                     if (data.base64_image) {
                         const base64Image = `${data.base64_image}`;
+                        const base64ImageFull = "data:image/jpeg;base64," + data.base64_image_full
                         const imageElement = document.createElement('img');
                         imageElement.src = base64Image;
                         imageElement.alt = 'Uploaded image';
                         imageElement.className = 'uploaded-image';
                         imageElement.style.border = '1px solid black';
                         imageElement.style.padding = '5px';
+                        imageElement.style.cursor = 'pointer'; // Change cursor to indicate the image is clickable
                         outputDiv.appendChild(imageElement);
                         outputDiv.scrollTop = outputDiv.scrollHeight;
+
+                        // Add click event listener to swap to full version of the image
+                        imageElement.addEventListener('click', function() {
+                            // Check if the current src is the base64Image, if so, swap to base64ImageFull
+                            if (imageElement.src === base64Image) {
+                                imageElement.src = base64ImageFull;
+                            } else {
+                                // If already showing the full version, swap back to the smaller version
+                                imageElement.src = base64Image;
+                            }
+                        });
                     }
                 });
             }

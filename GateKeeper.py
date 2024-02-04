@@ -119,6 +119,7 @@ def GateKeep(input, ip, depth=0, stream=False):
                     "</startfunc>",
                 ],
                 max_tokens=500,
+                reppenalty=1.0
             )
         )[0]
     except TypeError:
@@ -147,9 +148,10 @@ def GateKeep(input, ip, depth=0, stream=False):
                     "endfunc",
                     "<endfunc>",
                     "}<",
-                    "</startfunc>",
+                    "</startfunc>"
                 ],
                 max_tokens=500,
+                reppenalty=1.0
             )
         )[0]
 
@@ -213,7 +215,7 @@ def Util(rsp, ip, depth):
         if "params" in rsp
         else (rsp["parameters"] if "parameters" in rsp else rsp)
     )
-
+    
     if rsp["function"] == "acknowledge":
         return "null"
 
@@ -285,21 +287,26 @@ def Util(rsp, ip, depth):
             return "null"
         time.sleep(5)
         checkstring = ""
-        params["code"] = "import warnings\nwarnings.filterwarnings('ignore')\n" + params['code']
-        ocode = params["code"]
-        if "plt.show()" in params["code"]:
-            params["code"] = re.sub("print\s*\(.*\)", "", params["code"])
+        runcode = ''
+        if 'code' in params:
+            runcode = params['code'] 
+        else:
+            runcode = params
+        runcode = "import warnings\nwarnings.filterwarnings('ignore')\n" + runcode
+        ocode = runcode
+        if "plt.show()" in runcode:
+            runcode = re.sub("print\s*\(.*\)", "", runcode)
             plotb64 = """import io\nimport base64\nbyt = io.BytesIO()\nplt.savefig(byt, format='png')\nbyt.seek(0)\nprint(f'data:image/png;base64,{base64.b64encode(byt.read()).decode()}',end="")"""
-            params["code"] = params["code"].replace("plt.show()", plotb64)
+            runcode = runcode.replace("plt.show()", plotb64)
 
         output = subprocess.run(
-            ["python3", "-c", params["code"]],
+            ["python3", "-c", runcode],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
 
         stdout, stderr = output.stdout.decode(), output.stderr.decode()
-        if output.returncode == 0 and "yfinance" in params['code']:
+        if output.returncode == 0 and "yfinance" in runcode:
             stderr = ""
         if (
             stderr != ""
@@ -321,7 +328,7 @@ def Util(rsp, ip, depth):
         else:
             print(output)
         result = (
-            f"Code to be ran: \n```{params['code']}```\n<Code interpreter output>:\nstdout: {stdout}\nstderr: {stderr}\n<\Code interpreter output>"
+            f"Code to be ran: \n```{runcode}```\n<Code interpreter output>:\nstdout: {stdout}\nstderr: {stderr}\n<\Code interpreter output>"
             if checkstring == ""
             else f"Code to be ran: \n```{ocode}```\n<Code interpreter output>:\nstdout:\nstderr: {stderr}\n<\Code interpreter output>{checkstring}"
         )
