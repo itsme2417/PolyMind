@@ -50,7 +50,15 @@ with open(os.path.join(path, "functions.json")) as user_file:
             searchfunc = template
             continue
         else:
+            try: 
+                if x['name'] == 'generateimage' and not Shared_vars.config.enabled_features['imagegeneration']['enabled']:
+                    continue
+                if not Shared_vars.config.enabled_features[x['name']]['enabled']:
+                    continue
+            except KeyError:
+                pass
             func += template
+
     if len(Shared_vars.plugin_manifests) > 0:
         for x in Shared_vars.plugin_manifests:
             params = (
