@@ -261,10 +261,11 @@ def upload_file():
             or ".jpeg" in file.filename
             or ".png" in file.filename
         ) and Shared_vars.config.enabled_features["image_input"]["enabled"]:
+            result = identify(file_content.split(',')[1])
             Shared_vars.mem[f"{request.remote_addr}"].append(
-                f"\n{Shared_vars.config.llm_parameters['beginsep']} user: {identify(file_content.split(',')[1])} {Shared_vars.config.llm_parameters['endsep']}"
+                f"\n{Shared_vars.config.llm_parameters['beginsep']} user: {result} {Shared_vars.config.llm_parameters['endsep']}"
             )
-
+            Shared_vars.vismem[f"{request.remote_addr}"].append({"user": result})
             return jsonify(
                 {
                     "base64_image": create_thumbnail(

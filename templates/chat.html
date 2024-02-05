@@ -379,9 +379,12 @@
                 .then(response => response.json())
                 .then(data => {
                     data.forEach(chatItem => {
-                            appendOutput(chatItem['user'], true); // Display user input messages
-                            appendOutput(chatItem['assistant'].replace(/\n/g,"<br>"), false); // Display assistant response messages
-
+                        try {
+                            if (!chatItem['user'].includes("<image>Description:")){
+                                appendOutput(chatItem['user'], true); // Display user input messages
+                                appendOutput(chatItem['assistant'].replace(/\n/g,"<br>"), false); // Display assistant response messages
+                            }
+                        } catch { };
                     });
                     adjustOutputContainerHeight();
                 });

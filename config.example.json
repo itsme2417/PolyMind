@@ -27,6 +27,7 @@
     "Enabled_features": {
         "image_input": {
             "enabled": true,
+            "backend": "moondream",
             "URI": "http://127.0.0.1:8080/completion"
         },
         "file_input": {

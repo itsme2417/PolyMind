@@ -93,10 +93,13 @@ def GateKeep(input, ip, depth=0, stream=False):
     try:
         ctxstr = ""
         for x in Shared_vars.vismem[f"{ip}"][-2:]:
+            temp = ""
+            if "assistant" in x:
+                temp = "PolyMind: " + x["assistant"] + "\n"
             ctxstr += re.sub(
                 r"!\[.*?\]\(.*?\)|<img.*?>|\[\{.*?\}\]",
                 "",
-                "USER: " + x["user"] + "\n" + "PolyMind: " + x["assistant"],
+                "USER: " + x["user"] + "\n" + temp,
             )
         today = datetime.utcnow().strftime("%Y-%m-%d %H:%M")    
         content = 'Output:\n<startfunc>\n[{\n  "function": "'

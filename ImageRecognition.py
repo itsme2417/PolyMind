@@ -9,6 +9,14 @@ import base64
 import numpy as np
 import json
 from Shared_vars import blipcache, config
+from transformers import AutoModelForCausalLM, CodeGenTokenizerFast as Tokenizer
+from PIL import Image
+
+if config.enabled_features["image_input"]["backend"] == "moondream":
+    model_id = "vikhyatk/moondream1"
+    model = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code=True)
+    tokenizer = Tokenizer.from_pretrained(model_id)
+
 
 yolo = torch.hub.load("ultralytics/yolov5", "yolov5m")
 reader = easyocr.Reader(["en"])
@@ -176,7 +184,13 @@ def identify(input):
     if sha in blipcache:
         out = blipcache[sha]
     else:
-        out = llamacpp_img(raw_image)
+        if config.enabled_features["image_input"]["backend"] != "moondream":
+            out = llamacpp_img(raw_image)
+            print(out)
+        else:
+            enc_image = model.encode_image(raw_image)
+            out = model.answer_question(enc_image, "Write a short detailed caption including all important information:", tokenizer)
+            print(out)
         blipcache[sha] = out
     imageoutput = out
     return f" <image>Description: {imageoutput}; {ocrTranscription}; {foundobj}</image>"
