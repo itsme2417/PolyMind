@@ -245,13 +245,10 @@ def upload_file():
         Shared_vars.config.enabled_features["image_input"]["enabled"]
         or Shared_vars.config.enabled_features["file_input"]["enabled"]
     ):
-        if f"{request.remote_addr}" in chosenfunc:
-            chosenfunc[f"{request.remote_addr}"]["func"] = "procimg"
-        else:
-            chosenfunc[f"{request.remote_addr}"] = {
-                "func": "procimg",
-                "ip": f"{request.remote_addr}",
-            }
+        if not f"{request.remote_addr}" in Shared_vars.mem or not f"{request.remote_addr}" in Shared_vars.vismem:
+            Shared_vars.mem[f"{request.remote_addr}"] = []
+            Shared_vars.vismem[f"{request.remote_addr}"] = []
+
         imgstr = ""
         file = request.files["file"]
         file_content = request.form["content"]
@@ -261,7 +258,15 @@ def upload_file():
             or ".jpeg" in file.filename
             or ".png" in file.filename
         ) and Shared_vars.config.enabled_features["image_input"]["enabled"]:
+            if f"{request.remote_addr}" in chosenfunc:
+                chosenfunc[f"{request.remote_addr}"]["func"] = "procimg"
+            else:
+                chosenfunc[f"{request.remote_addr}"] = {
+                    "func": "procimg",
+                    "ip": f"{request.remote_addr}",
+                }
             result = identify(file_content.split(',')[1])
+            
             Shared_vars.mem[f"{request.remote_addr}"].append(
                 f"\n{Shared_vars.config.llm_parameters['beginsep']} user: {result} {Shared_vars.config.llm_parameters['endsep']}"
             )
