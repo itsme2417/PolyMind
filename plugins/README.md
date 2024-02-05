@@ -27,7 +27,8 @@ The `manifest.json` file contains metadata about the plugin, such as the module 
 
 The `main.py` file should contain the following format:
 
-```def main(params, memory, infer, ip, Shared_vars):
+```
+def main(params, memory, infer, ip, Shared_vars):
 
     return f"This will be sent to the model"
 if __name__ == "__main__":
