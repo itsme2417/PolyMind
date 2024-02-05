@@ -18,3 +18,4 @@ websocket-client==1.6.4
 wolframalpha==5.0.0
 sentence-transformers==2.2.2
 onnxruntime-gpu==1.16.3
+pandas==2.1.2
