@@ -1,6 +1,8 @@
 ## Plugins
 Polymind supports adding extra functions that the model can access. Included is an example plugin that allows the model to ask chatgpt questions.
 
+Another example is [DocShotgun's pubmed search plugin](https://github.com/DocShotgun/pubmedsearch-polymind)
+
 ## Adding / Developing plugins
 
 The format of plugins is a folder under the plugins directory, a `main.py` file and `manifest.json`. the name of the plugin should match the "module_name" under manifest.json and is the name that will be used to enable the plugin in the config.json.
