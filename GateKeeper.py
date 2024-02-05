@@ -372,5 +372,5 @@ def Util(rsp, ip, depth):
         if len(Shared_vars.plugin_manifests) > 0:
             for x in Shared_vars.plugin_manifests:
                 if rsp["function"] == x['name']:
-                    return Shared_vars.loadedplugins[x['module_name']].main(params, Shared_vars.mem, infer, ip)
+                    return Shared_vars.loadedplugins[x['module_name']].main(params, Shared_vars.mem, infer, ip, Shared_vars)
     return "null"

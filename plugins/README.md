@@ -27,11 +27,11 @@ The `manifest.json` file contains metadata about the plugin, such as the module 
 
 The `main.py` file should contain the following format:
 
-```def main(params, memory, infer, ip):
+```def main(params, memory, infer, ip, Shared_vars):
 
     return f"This will be sent to the model"
 if __name__ == "__main__":
-    main(params, memory, infer, ip)```
+    main(params, memory, infer, ip, Shared_vars)```
 
     
 params is a dict contained any parameters from the function call, memory is polymind's context and infer is a function to do inference using the main model. [See inference.py](https://github.com/itsme2417/PolyMind/blob/main/inference.py) ip is the ip of the user who sent the request.
