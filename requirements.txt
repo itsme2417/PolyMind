@@ -19,3 +19,5 @@ wolframalpha==5.0.0
 sentence-transformers==2.2.2
 onnxruntime-gpu==1.16.3
 pandas==2.1.2
+einops==0.7.0
+timm==0.9.12
