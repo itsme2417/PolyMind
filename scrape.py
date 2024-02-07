@@ -78,12 +78,14 @@ def shorten_text(text, max_tokens):
 
 def scrape_site(url, max_tokens):
     try:  # Thanks cybertimon for part of the script that finally made me implement scraping.
-        if url.endswith(".pdf"):
+        response = requests.get(url, timeout=3, impersonate="chrome110")
+        content_type = response.headers.get('content-type')
+        if url.endswith(".pdf") or 'application/pdf' in content_type:
             text = ""
             for x in get_pdf_from_url(url).pages:
                 text += x.extract_text()
         else:
-            response = requests.get(url, timeout=3, impersonate="chrome110")
+            
             soup = BeautifulSoup(response.text, "lxml")
             text = soup.get_text()
         text = text.strip()
