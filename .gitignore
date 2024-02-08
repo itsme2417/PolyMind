@@ -169,5 +169,5 @@ node_modules/
 memory.json
 embeddings_cache/*
 !embeddings_cache/cached_embeddings_go_here
-!plugins/chatgpt
+!plugins/chatgpt/*
 plugins/*
