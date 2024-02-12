@@ -79,6 +79,42 @@ def get_image_size(url):
     img = Image.open(BytesIO(response.content))
     return img.size[0] + img.size[1]
 
+def verifyFunc(result, x, input, stopstrings):
+    systemprompt=f'''Context: {result}.\nUpdate the following function call according to the newly obtained context and taking into consideration the user input.\nFunction call: {x}\nProvide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.'''
+    content = 'Output:\n<startfunc>\n{\n  "function": "' + f'{x["function"]}",\n"params":' + " {"
+    content += next(
+        infer(
+            "Input: " + input,
+            mem=[],
+            modelname='Output:\n<startfunc>\n{\n  "function": "' + f'{x["function"]}",\n"params":' + " {" ,
+            system=systemprompt,
+            temperature=0.1,
+            top_p=0.1,
+            min_p=0.05,
+            top_k=40,
+            stopstrings=stopstrings,
+            max_tokens=500,
+            reppenalty=1.0,
+            max_temp=0,
+            min_temp=0
+        )
+    )[0]
+    try:
+        if "<startfunc>" in content:
+            content = content.split("<startfunc>")[1]
+        content = (
+            re.sub(r"\\_", "_", html.unescape(content))
+            .replace("\\_", "_")
+            .replace("}<", "}")
+            .replace("<startfunc>", "")
+            .replace("</", "")
+            .replace("<", "")
+        )
+        print(f'Updated function call: {content}')
+    except Exception as e:
+        print(e)
+        return x
+    return json.loads(content)
 
 def GateKeep(input, ip, depth=0, stream=False):
     content = ""
@@ -168,7 +204,8 @@ def GateKeep(input, ip, depth=0, stream=False):
                     x["parameters"]["query"] = input
                 else:
                     x["query"] = input
-
+            if result != "":
+                x = verifyFunc(result, x, input, stopstrings)
             run = Util(x, ip, depth)
             if run != "null":
                 result += run
