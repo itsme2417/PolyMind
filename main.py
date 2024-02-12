@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify, Response
 from GateKeeper import GateKeep, infer
 from Shared import Adapters
-from datetime import datetime
+import datetime
 import Shared_vars
 import io
 import base64
@@ -46,7 +46,7 @@ chosenfunc = {}
 currenttoken = {}
 
 app = Flask(__name__)
-today = datetime.utcnow().strftime("%Y-%m-%d %H:%M")
+today = datetime.date.today()
 
 
 @app.route("/stream")
@@ -171,7 +171,9 @@ def chat():
                 "SYSTEM:",
                 '<img src="data:image/jpeg;base64,',
                 '<|endoftext|>',
-                '[FINISHED]'
+                '[FINISHED]',
+                'User:',
+                'Polymind:'
             ],
             streamresp=True,
             few_shot=Shared_vars.config.llm_parameters['fewshot']
@@ -181,25 +183,21 @@ def chat():
                 currenttoken[f"{request.remote_addr}"] = {
                     "func": "",
                     "ip": f"{request.remote_addr}",
-                    "token": html.escape(complete[0]).replace("\n", "<br>"),
+                    "token": complete[0],
                 }
             else:
                 complete[1] = tok[1]
                 currenttoken[f"{request.remote_addr}"] = {
                     "func": "",
                     "ip": f"{request.remote_addr}",
-                    "token": convert_to_html_code_block(html.escape(complete[0]) if "<img src" not in complete[0] else complete[0]).replace(
-                        "\n", "<br>"
-                    )
+                    "token": complete[0]
                     + "</s><s>",
                 }
         Shared_vars.mem[f"{request.remote_addr}"] = complete[1]
         Shared_vars.vismem[f"{request.remote_addr}"].append(
             {
                 "user": user_input,
-                "assistant": convert_to_html_code_block(html.escape(complete[0])).replace(
-                    "\n", "<br>"
-                ),
+                "assistant": complete[0]
             }
         )
 

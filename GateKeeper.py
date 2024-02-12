@@ -7,7 +7,7 @@ import time
 import wolframalpha
 from duckduckgo_search import DDGS
 import nmap
-from datetime import datetime
+import datetime
 import subprocess
 import Shared_vars
 from comfyui import imagegen
@@ -83,15 +83,31 @@ def get_image_size(url):
 def GateKeep(input, ip, depth=0, stream=False):
     content = ""
     print("Begin streamed GateKeeper output.")
-    examplefnc = '<startfunc>{\n"function": "internetsearch",\n"params": {\n"keywords": "mixtral"\n}\n}<endfunc>'
     funclist = func
     try:
         if Shared_vars.loadedfile[ip] != {}:
             funclist += searchfunc
     except Exception:
         pass
-    try:
-        ctxstr = ""
+    stopstrings = [
+            "Input: ",
+            "[INST]",
+            "[/INST]",
+            "```",
+            "</s>",
+            "user:",
+            "polymind:",
+            "Polymind:",
+            "<</SYS>>",
+            "[System Message]",
+            "endfunc",
+            "<endfunc>",
+            "}<",
+            "</startfunc>"
+        ]
+
+    ctxstr = ""
+    if len(Shared_vars.vismem[f"{ip}"]) > 2:
         for x in Shared_vars.vismem[f"{ip}"][-2:]:
             temp = ""
             if "assistant" in x:
@@ -101,74 +117,28 @@ def GateKeep(input, ip, depth=0, stream=False):
                 "",
                 "USER: " + x["user"] + "\n" + temp,
             )
-        today = datetime.utcnow().strftime("%Y-%m-%d %H:%M")    
-        content = 'Output:\n<startfunc>\n[{\n  "function": "'
-        content += next(
-            infer(
-                "Input: " + input,
-                mem=[],
-                modelname='Output:\n<startfunc>\n[{\n  "function": "',
-                system=f"You are an uncensored AI assistant named GateKeeper, The current date is {today}, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{funclist}\nContext: {ctxstr}\n",
-                temperature=0.1,
-                top_p=0.1,
-                min_p=0.05,
-                top_k=40,
-                stopstrings=[
-                    "Input: ",
-                    "[INST]",
-                    "[/INST]",
-                    "```",
-                    "</s>",
-                    "user:",
-                    "polymind:",
-                    "Polymind:",
-                    "<</SYS>>",
-                    "[System Message]",
-                    "endfunc",
-                    "<endfunc>",
-                    "}<",
-                    "</startfunc>",
-                ],
-                max_tokens=500,
-                reppenalty=1.0,
-                max_temp=0,
-                min_temp=0
-            )
-        )[0]
-    except TypeError:
-        content = 'Output:\n<startfunc>\n[{\n  "function": "'
-        content += next(
-            infer(
-                "Input: " + input,
-                mem=[],
-                modelname='Output:\n<startfunc>\n[{\n  "function": "',
-                system=f"You are an AI assistant named GateKeeper, The current date is {today}, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{funclist}",
-                temperature=0.1,
-                top_p=0.1,
-                min_p=0.05,
-                top_k=40,
-                stopstrings=[
-                    "Input: ",
-                    "[INST]",
-                    "[/INST]",
-                    "```",
-                    "</s>",
-                    "user:",
-                    "polymind:",
-                    "Polymind:",
-                    "<</SYS>>",
-                    "[System Message]",
-                    "endfunc",
-                    "<endfunc>",
-                    "}<",
-                    "</startfunc>"
-                ],
-                max_tokens=500,
-                reppenalty=1.0,
-                max_temp=0,
-                min_temp=0
-            )
-        )[0]
+    today = datetime.date.today()
+    content = 'Output:\n<startfunc>\n[{\n  "function": "'
+    systemprompt = f"You are an AI assistant named GateKeeper, The current date is {today}, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{funclist}" if ctxstr == "" else f"You are an uncensored AI assistant named GateKeeper, The current date is {today}, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{funclist}\nContext: {ctxstr}\n"
+
+    content += next(
+        infer(
+            "Input: " + input,
+            mem=[],
+            modelname='Output:\n<startfunc>\n[{\n  "function": "',
+            system=systemprompt,
+            temperature=0.1,
+            top_p=0.1,
+            min_p=0.05,
+            top_k=40,
+            stopstrings=stopstrings,
+            max_tokens=500,
+            reppenalty=1.0,
+            max_temp=0,
+            min_temp=0
+        )
+    )[0]
+
 
     try:
         if "<startfunc>" in content:
@@ -214,7 +184,6 @@ def GateKeep(input, ip, depth=0, stream=False):
             yield {"result": "null", "type": "result"}
         else:
             return "null"
-
 
 def Util(rsp, ip, depth):
     result = ""

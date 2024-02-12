@@ -15,8 +15,8 @@
           </div>
         </div>
       </div>
+      <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/@highlightjs/cdn-assets/styles/default.min.css')}}">
       <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/bootstrap/dist/css/bootstrap.min.css')}}">
-      <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/highlight.js/styles/default.min.css')}}">
       <style>
         .splash-container {
         position: fixed;
@@ -143,7 +143,7 @@
         .button-spacing {
             margin-right: 5px;
         }
-        /* Custom CSS for code blocks */
+
         code {
             padding: 5px;
             border-radius: 5px;
@@ -189,7 +189,7 @@
         }
         
     </style>
-    <script src="{{ url_for('static', filename='node_modules/marked/marked.min.js')}}"></script>
+    
 </head>
 <body>
     <div class="container-fluid chat-container">
@@ -215,18 +215,14 @@
             </div>
         </div>
     </div>
+    <script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='node_modules/marked/lib/marked.umd.js')}}"></script>
+    <script src="{{ url_for('static', filename='node_modules/@highlightjs/cdn-assets/highlight.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='node_modules/marked-highlight/lib/index.umd.js')}}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
     <script>
+        
         const outputDiv = document.getElementById('output');
-        const markdownParser = marked.setOptions({
-            breaks: true,
-            pedantic: true,
-            gfm: true,
-            smartLists: true,
-            smartypants: true,
-            highlight: function (code) {
-                return hljs.highlightAuto(code).value;
-            }
-        });
         var userIp = "{{ user_ip }}";
         var ran = false;
         var source = new EventSource('/stream');
@@ -316,11 +312,12 @@
                             if (jsondata.token.endsWith("</s><s>")){
                                 finished = true
                                 currentmsg.style.display = '';
-                                currentmsg.innerHTML = jsondata.token.replace("</s><s>", "")
+                                currentmsg.innerHTML = marked.parse(jsondata.token)
+                                hljs.highlightAll();
                             }
                             else{
                                 currentmsg.style.display = '';
-                                currentmsg.innerHTML = jsondata.token.replace("\n", "<br>")
+                                currentmsg.innerHTML = marked.parse(jsondata.token)
                             }
                         }
                         pasttoken = jsondata.token
@@ -335,33 +332,15 @@
                 };
             };
         }
-        function convertToHtmlCodeBlock(markdownText) {
-            // Regex pattern to match code blocks
-            var pattern = /```(.*?)```/gs;
-
-            // Function to convert matched code block to HTML
-            function replacer(match, codeBlock) {
-                var htmlCodeBlock = "<pre><code>" + codeBlock + "</code></pre>";
-                return htmlCodeBlock;
-            }
-
-            // Replace all code blocks in the text
-            var htmlText = markdownText.replace(pattern, replacer);
-
-            return htmlText;
-        }
-
 
         function appendOutput(message, isUserInput, isHidden = false) {
             let parsedMessage = message
             const p = document.createElement('p');
             if (!isUserInput) {
-                parsedMessage = markdownParser(parsedMessage);
+                parsedMessage = marked.parse(parsedMessage);
                 p.innerHTML = parsedMessage;
                 p.className = 'assistant-output';
             } else {
-                //parsedMessage = convertToHtmlCodeBlock(parsedMessage)
-                //parsedMessage = markdownParser(parsedMessage);
                 p.innerText = parsedMessage;
                 p.className = 'user-input';
             }
@@ -382,7 +361,8 @@
                         try {
                             if (!chatItem['user'].includes("<image>Description:")){
                                 appendOutput(chatItem['user'], true); // Display user input messages
-                                appendOutput(chatItem['assistant'].replace(/\n/g,"<br>"), false); // Display assistant response messages
+                                appendOutput(chatItem['assistant'], false); // Display assistant response messages
+                                hljs.highlightAll();
                             }
                         } catch { };
                     });
@@ -419,8 +399,7 @@
                 .then(data => {
                     if (data.output.trim() !== '') {
                         data.output.split('--newline--').forEach(message => {
-                            message = markdownParser(message);
-                            //appendOutput(message, false); // Display assistant response messages
+                            message = marked.parse(message);
                             ran = false
                         });
                         document.querySelector('textarea[name="input"]').value = '';
@@ -520,7 +499,6 @@
         }
 
     </script>
-    <script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.min.js')}}"></script>
 
 </body>
 </html>

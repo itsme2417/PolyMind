@@ -1,6 +1,6 @@
 [    {
         "name": "acknowledge",
-        "description": "This function should always be used if no other function is required / wouldnt be useful for the input and the user is just talking to the assistant.",
+        "description": "This function should always be used if no other function is required / wouldnt be useful for the input or if the user is just talking to the assistant. This should also be called when requesting to write code without requesting said code to be ran.",
         "params": {
             "message": "an optional message from GateKeeper, it should not exceed 5 words."
         }
@@ -28,9 +28,9 @@
     },    
     {
         "name": "runpythoncode",
-        "description": "This runs python code. Use sparingly. Only execute code when safe, and asked to directly by the user or when absolutely neccessary to solve things like complex math. Do not use newlines. Write the code in a single line. Always include a print statement as the user can only see stdout.",
+        "description": "Runs python code, only execute code when safe, and asked to directly by the user, do not execute when user asks to *write* code, only when asked to *run*.",
         "params": {
-            "code": "The python code to run."
+            "code": "The python code to run, use ; and not newlines and ALWAYS write the code in a single line. Always include a print statement as the user can only see stdout"
         }
     },    
     {
