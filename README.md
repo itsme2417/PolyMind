@@ -70,7 +70,8 @@ If you want to mess around with my llm discord bot or join for whatever reason, 
 https://discord.gg/zxPCKn859r
 
 ## Screenshots
-![screenshot0](/images/screenshot0.png)
-![screenshot1](/images/screenshot1.png)
-![screenshot2](/images/screenshot2.png)
-![screenshot3](/images/screenshot3.png)
+[![screenshot0](/images/thumb.screenshot0.png)](/images/screenshot0.png)
+[![screenshot1](/images/thumb.screenshot1.png)](/images/screenshot1.png)
+[![screenshot2](/images/thumb.screenshot2.png)](/images/screenshot2.png)
+[![screenshot3](/images/thumb.screenshot3.png)](/images/screenshot3.png)
+[![screenshot0](/images/thumb.screenshot4.png)](/images/screenshot4.png)
