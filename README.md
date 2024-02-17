@@ -1,6 +1,6 @@
 # PolyMind
 
-PolyMind is a multimodal, function calling powered LLM webui. It's designed to be used with Mixtral 8x7B + TabbyAPI and offers a wide range of features including:
+PolyMind is a multimodal, function calling powered LLM webui. It's designed to be used with Mixtral 8x7B + TabbyAPI, but can be used with llama.cpp's included server and, when using the compatiblity mode + tabbyAPI mode, any endpoint with /v1/completions support, and offers a wide range of features including:
 
 - Internet searching with DuckDuckGo and web scraping capabilities.
 - Image generation using comfyui.
@@ -44,6 +44,7 @@ For an example on how to use polymind as a basic API Server check [Examples](htt
 The application's configuration is stored in the `config.json` file. Here's a description of each option:
 
 - `Backend`: The backend that runs the LLM. Options: `tabbyapi` or `llama.cpp`.
+- `compatibility_mode`, `compat_tokenizer_model`: When set to true and a tokenizer model specified, will use a local tokenizer instead of one provided by the API server. To be used with endpoints without tokenization support, such as `KoboldCPP` or similar.
 - `HOST` and `PORT`: The IP address and port of the backend.
 - `admin_ip`: The IP address of the admin/trusted user. Necessary to use the Python interpreter and change settings.
 - `listen`: Whether to allow other hosts in the network to access the webui.

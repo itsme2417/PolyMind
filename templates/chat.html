@@ -317,7 +317,7 @@
                             if (jsondata.token.endsWith("</s><s>")){
                                 finished = true
                                 currentmsg.style.display = '';
-                                currentmsg.innerHTML = marked.parse(jsondata.token)
+                                currentmsg.innerHTML = marked.parse(jsondata.token.replace("</s><s>", ""))
                                 hljs.highlightAll();
                             }
                             else{

@@ -168,7 +168,7 @@ def GateKeep(input, ip, depth=0, stream=False):
             min_p=0.05,
             top_k=40,
             stopstrings=stopstrings,
-            max_tokens=500,
+            max_tokens=Shared_vars.config.llm_parameters['max_new_tokens_gatekeeper'],
             reppenalty=1.0,
             max_temp=0,
             min_temp=0

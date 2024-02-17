@@ -1,4 +1,5 @@
 from pathlib import Path
+import sys
 import os
 import json
 import importlib.util
@@ -34,6 +35,13 @@ class Config:
         self.api_key = config["api_key"]
         self.ctxlen = config["max_seq_len"]
         self.reservespace = config["reserve_space"]
+        try:
+            self.compat = config["compatibility_mode"]
+            self.tokenmodel = config["compat_tokenizer_model"]
+        except KeyError:
+            print(
+                "\033[93m WARN: Config is missing compatibility_mode, Update your config to comply with the latest example config. \033[0m"
+            )   
         print("Loaded config")
 
 
@@ -50,7 +58,12 @@ TABBY = True if config.backend == "tabbyapi" else False
 address = "0.0.0.0" if config.listen else "127.0.0.1"
 loadedfile = {}
 
-
+if config.compat:
+    if config.tokenmodel == "":
+        print(
+            "\033[91mERROR: Compatibility_mode is set to true but no tokenizer model is set, Exiting... \033[0m"
+        )        
+    sys.exit()
 if (
     config.enabled_features["wolframalpha"]["enabled"]
     and config.enabled_features["wolframalpha"]["app_id"] == ""

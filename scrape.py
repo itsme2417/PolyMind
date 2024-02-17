@@ -4,15 +4,18 @@ from curl_cffi import requests
 import Shared_vars
 from PyPDF2 import PdfReader
 import io
-
+import traceback
+if Shared_vars.config.compat:
+    from transformers import AutoTokenizer
+    tokenizer = AutoTokenizer.from_pretrained(Shared_vars.config.tokenmodel)
 API_ENDPOINT_URI = Shared_vars.API_ENDPOINT_URI
+
 if Shared_vars.TABBY:
     API_ENDPOINT_URI += "v1/completions"
 else:
     API_ENDPOINT_URI += "completion"
 
 
-##TODO Support llama.cpp
 def get_pdf_from_url(url):
     """
     :param url: url to get pdf file
@@ -25,44 +28,53 @@ def get_pdf_from_url(url):
 
 
 def tokenize(input):
-    payload = {
-        "add_bos_token": "true",
-        "encode_special_tokens": "true",
-        "decode_special_tokens": "true",
-        "text": input,
-        "content": input,
-    }
-    request = requests.post(
-        API_ENDPOINT_URI.replace("completions", "token/encode") if Shared_vars.TABBY else API_ENDPOINT_URI.replace("completion", "tokenize"),
-        headers={
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {Shared_vars.API_KEY}",
-        },
-        json=payload,
-        timeout=360,
-    )
-    return request.json()["length"] if Shared_vars.TABBY else len(request.json()["tokens"]), request.json()["tokens"]
+    if Shared_vars.config.compat:
+        encoded_input = tokenizer.encode(input, return_tensors=None)
+        return len(encoded_input), encoded_input
+    else:
+        payload = {
+            "add_bos_token": "true",
+            "encode_special_tokens": "true",
+            "decode_special_tokens": "true",
+            "text": input,
+            "content": input,
+        }
+        request = requests.post(
+            API_ENDPOINT_URI.replace("completions", "token/encode") if Shared_vars.TABBY else API_ENDPOINT_URI.replace("completion", "tokenize"),
+            headers={
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {Shared_vars.API_KEY}",
+            },
+            json=payload,
+            timeout=360,
+        )
+        return request.json()["length"] if Shared_vars.TABBY else len(request.json()["tokens"]), request.json()["tokens"]
 
 
 def decode(input):
-    payload = {
-        "add_bos_token": "false",
-        "encode_special_tokens": "false",
-        "decode_special_tokens": "false",
-        "tokens": input,
-    }
-    request = requests.post(
-        API_ENDPOINT_URI.replace("completions", "token/decode") if Shared_vars.TABBY else API_ENDPOINT_URI.replace("completion", "detokenize"),
-        headers={
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {Shared_vars.API_KEY}",
-        },
-        json=payload,
-        timeout=360,
-    )
-    return request.json()["text"] if Shared_vars.TABBY else request.json()["content"]
+    if Shared_vars.config.compat:
+        print(input)
+        decoded_text = tokenizer.decode(input, skip_special_tokens=True)
+        return decoded_text
+    else:
+        payload = {
+            "add_bos_token": "false",
+            "encode_special_tokens": "false",
+            "decode_special_tokens": "false",
+            "tokens": input,
+        }
+        request = requests.post(
+            API_ENDPOINT_URI.replace("completions", "token/decode") if Shared_vars.TABBY else API_ENDPOINT_URI.replace("completion", "detokenize"),
+            headers={
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {Shared_vars.API_KEY}",
+            },
+            json=payload,
+            timeout=360,
+        )
+        return request.json()["text"] if Shared_vars.TABBY else request.json()["content"]
 
 
 def shorten_text(text, max_tokens):
@@ -95,5 +107,6 @@ def scrape_site(url, max_tokens):
         print("AFTER SHORTENING:", text)
         return text
     except Exception as e:
+        print(traceback.format_exc())
         print(e)
         return "Error: Requested site couldn't be viewed. Please inform in your response that the informations may not be up to date or correct."

@@ -3,6 +3,9 @@ import random
 import Shared_vars
 import requests
 import traceback
+if Shared_vars.config.compat:
+    from transformers import AutoTokenizer
+    tokenizer = AutoTokenizer.from_pretrained(Shared_vars.config.tokenmodel)
 
 API_ENDPOINT_URI = Shared_vars.API_ENDPOINT_URI
 API_KEY = Shared_vars.API_KEY
@@ -14,32 +17,37 @@ else:
 
 
 def tokenize(input):
-    if TABBY:
-        payload = {
-            "add_bos_token": "true",
-            "encode_special_tokens": "true",
-            "decode_special_tokens": "true",
-            "text": input,
-        }
-        request = requests.post(
-            API_ENDPOINT_URI.replace("completions", "token/encode"),
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {API_KEY}",
-            },
-            json=payload,
-            timeout=360,
-        )
-        return request.json()
+    if Shared_vars.config.compat:
+        encoded_input = tokenizer.encode(input, return_tensors=None)
+        tokens = tokenizer.convert_ids_to_tokens(encoded_input)
+        return {"length": len(encoded_input), "tokens": tokens}
     else:
-        payload = {"content": input}
-        request = requests.post(
-            API_ENDPOINT_URI.replace("completion", "tokenize"),
-            json=payload,
-            timeout=360,
-        )
-        return {"length": len(request.json()["tokens"])}
+        if TABBY:
+            payload = {
+                "add_bos_token": "true",
+                "encode_special_tokens": "true",
+                "decode_special_tokens": "true",
+                "text": input,
+            }
+            request = requests.post(
+                API_ENDPOINT_URI.replace("completions", "token/encode"),
+                headers={
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {API_KEY}",
+                },
+                json=payload,
+                timeout=360,
+            )
+            return request.json()
+        else:
+            payload = {"content": input}
+            request = requests.post(
+                API_ENDPOINT_URI.replace("completion", "tokenize"),
+                json=payload,
+                timeout=360,
+            )
+            return {"length": len(request.json()["tokens"])}
 
 
 def infer(

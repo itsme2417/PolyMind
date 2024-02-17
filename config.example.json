@@ -1,5 +1,7 @@
 {
     "Backend": "tabbyapi",
+    "compatibility_mode": false,
+    "compat_tokenizer_model":"",
     "HOST": "127.0.0.1",
     "PORT": 5000,
     "admin_ip": "127.0.0.1",
@@ -15,6 +17,8 @@
         "repetition_penalty": 1.0,
         "max_temp": 0,
         "min_temp": 0,
+        "max_new_tokens":2500,
+        "max_new_tokens_gatekeeper": 512,
         "fewshot":"",
         "eos": "",
         "beginsep": "[INST]",

@@ -158,7 +158,7 @@ def chat():
             mem=Shared_vars.mem[f"{request.remote_addr}"],
             username=username,
             modelname="polymind:",
-            max_tokens=2500,
+            max_tokens=Shared_vars.config.llm_parameters['max_new_tokens'],
             temperature=Shared_vars.config.llm_parameters["temperature"],
             top_p=1,
             min_p=Shared_vars.config.llm_parameters["min_p"],
