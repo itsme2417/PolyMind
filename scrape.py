@@ -4,7 +4,6 @@ from curl_cffi import requests
 import Shared_vars
 from PyPDF2 import PdfReader
 import io
-import traceback
 if Shared_vars.config.compat:
     from transformers import AutoTokenizer
     tokenizer = AutoTokenizer.from_pretrained(Shared_vars.config.tokenmodel)
@@ -107,6 +106,5 @@ def scrape_site(url, max_tokens):
         print("AFTER SHORTENING:", text)
         return text
     except Exception as e:
-        print(traceback.format_exc())
         print(e)
         return "Error: Requested site couldn't be viewed. Please inform in your response that the informations may not be up to date or correct."
