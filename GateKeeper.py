@@ -88,15 +88,15 @@ def verifyFunc(result, x, input, stopstrings):
             mem=[],
             modelname='Output:\n<startfunc>\n{\n  "function": "' + f'{x["function"]}",\n"params":' + " {" ,
             system=systemprompt,
-            temperature=0.1,
-            top_p=0.1,
-            min_p=0.05,
-            top_k=40,
+            temperature=1.0,
+            top_p=1.0,
+            min_p=0.0,
+            top_k=1,
             stopstrings=stopstrings,
             max_tokens=500,
             reppenalty=1.0,
-            max_temp=0,
-            min_temp=0
+            max_temp=1.0,
+            min_temp=1.0
         )
     )[0]
     try:
@@ -165,15 +165,15 @@ def GateKeep(input, ip, depth=0, stream=False):
             mem=[],
             modelname='Output:\n<startfunc>\n[{\n  "function": "',
             system=systemprompt,
-            temperature=0.1,
-            top_p=0.1,
-            min_p=0.05,
-            top_k=40,
+            temperature=1.0,
+            top_p=1.0,
+            min_p=0.0,
+            top_k=1,
             stopstrings=stopstrings,
             max_tokens=Shared_vars.config.llm_parameters['max_new_tokens_gatekeeper'],
             reppenalty=1.0,
-            max_temp=0,
-            min_temp=0
+            max_temp=1.0,
+            min_temp=1.0
         )
     )[0]
 

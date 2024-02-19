@@ -7,6 +7,7 @@ import io
 if Shared_vars.config.compat:
     from transformers import AutoTokenizer
     tokenizer = AutoTokenizer.from_pretrained(Shared_vars.config.tokenmodel)
+from trafilatura import fetch_url, extract
 API_ENDPOINT_URI = Shared_vars.API_ENDPOINT_URI
 
 if Shared_vars.TABBY:
@@ -97,10 +98,12 @@ def scrape_site(url, max_tokens):
                 text += x.extract_text()
         else:
             
-            soup = BeautifulSoup(response.text, "lxml")
-            text = soup.get_text()
+            #soup = BeautifulSoup(response.text, "lxml")
+            #text = soup.get_text()
+            text = extract(response.text)
+
         text = text.strip()
-        text = text.replace("\n", "")
+        #text = text.replace("\n", "")
         print("BEFORE SHORTENING:", text)
         text, token_count = shorten_text(text, max_tokens)
         print("AFTER SHORTENING:", text)
