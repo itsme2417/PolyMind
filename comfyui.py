@@ -20,6 +20,11 @@ from pathlib import Path
 from prompts import getsdprompts
 
 client_id = str(uuid.uuid4())
+if Shared_vars.config.enabled_features["imagegeneration"]["automatic_background_removal"]:
+    from transformers import pipeline
+
+    pipe = pipeline("image-segmentation", model="briaai/RMBG-1.4",revision ="refs/pr/9", trust_remote_code=True, )
+
 with open(
     os.path.join(Path(os.path.abspath(__file__)).parent, "comfyui_workflow_lcm.json")
 ) as workflow:
@@ -143,13 +148,13 @@ def aspect2res(inp):
         return ["1024", "1024"]
 
 
-def imagegen(msg):
+def imagegen(msg, removebg = False):
     replyid = False
     imgtoimg = False
 
     payload = getsdprompts(replyid, msg, imgtoimg)
     chat_completion = openaiclient.chat.completions.create(
-        model="gpt-4",
+        model="gpt-3.5-turbo",
         messages=payload,
         temperature=0.1,
         max_tokens=150,
@@ -175,4 +180,17 @@ def imagegen(msg):
         width=res[0],
         height=res[1],
     )[0]
-    return f"[<image>{x}<image>]"
+    #TODO: Handle images in memory once RMBG is added to transfomers properly.
+    if removebg:
+        with open(os.path.join(Path(os.path.abspath(__file__)).parent, "temp.png"), 'wb') as image_file:
+            image_file.write(base64.b64decode(x))
+        pipe(os.path.join(Path(os.path.abspath(__file__)).parent, "temp.png"),out_name=os.path.join(Path(os.path.abspath(__file__)).parent, "tempf.png")) 
+        with open(os.path.join(Path(os.path.abspath(__file__)).parent, "tempf.png"), 'rb') as image_file:
+            image_bytes = image_file.read()
+            x = base64.b64encode(image_bytes).decode('utf-8')
+        if os.path.exists(os.path.join(Path(os.path.abspath(__file__)).parent, "temp.png")) and os.path.exists(os.path.join(Path(os.path.abspath(__file__)).parent, "tempf.png")):
+            os.remove(os.path.join(Path(os.path.abspath(__file__)).parent, "temp.png"))
+            os.remove(os.path.join(Path(os.path.abspath(__file__)).parent, "tempf.png"))
+            print("Removed temp images")
+
+    return f"{tosend} [<image>{x}<image>]"

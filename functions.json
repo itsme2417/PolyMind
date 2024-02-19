@@ -52,7 +52,8 @@
         "name": "generateimage",
         "description": "This uses stable diffusion to generate a requested image. As polymind is able to view images, do not mistake a request about a sent image as being a request for this.",
         "params": {
-            "prompt": "The prompt for stable diffusion to generate the image from. Remember to include the medium in the prompt, for example: photo, painting, sketch, drawing, etc."
+            "prompt": "The prompt for stable diffusion to generate the image from. Remember to include the medium in the prompt, for example: photo, painting, sketch, drawing, etc.",
+            "removebg":"lowercase bool, whether to generate a transparent image or not, should ALWAYS be false unless the user requests a transparent/ no background image in which case it should be true."
 
        }
      },

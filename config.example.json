@@ -42,7 +42,8 @@
         "imagegeneration": {
             "enabled": true,
             "server_address": "127.0.0.1:8188",
-            "checkpoint_name": "turbovisionxl431Fp16.p3Q5.safetensors"
+            "checkpoint_name": "turbovisionxl431Fp16.p3Q5.safetensors",
+            "automatic_background_removal": false
         },
         "wolframalpha": {
             "enabled": true,

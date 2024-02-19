@@ -1,9 +1,9 @@
 # PolyMind
 
-PolyMind is a multimodal, function calling powered LLM webui. It's designed to be used with Mixtral 8x7B + TabbyAPI, but can be used with llama.cpp's included server and, when using the compatiblity mode + tabbyAPI mode, any endpoint with /v1/completions support, and offers a wide range of features including:
+PolyMind is a multimodal, function calling powered LLM webui. It's designed to be used with Mixtral 8x7B-Instruct/Mistral-7B-Instruct-v0.2 + TabbyAPI, but can be used with other models and/or with llama.cpp's included server and, when using the compatiblity mode + tabbyAPI mode, any endpoint with /v1/completions support, and offers a wide range of features including:
 
 - Internet searching with DuckDuckGo and web scraping capabilities.
-- Image generation using comfyui.
+- Image generation using comfyui along with optional, function calling controlled, automatic background removal using RMBG-1.4.
 - Image input with sharegpt4v (Over llama.cpp's server)/moondream on CPU, OCR, and Yolo.
 - Port scanning with nmap.
 - Wolfram Alpha integration.

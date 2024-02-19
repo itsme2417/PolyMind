@@ -108,10 +108,12 @@ def chat():
         imgstr = ""
         genedimage = False
         if "[<image>" in Kept:
+            prmpt = Kept.split("[<image>")[0]
             newinp += (
                 answers.strip()
-                + "\nSYSTEM: Image generated with Stable Diffusion and sent to user succesfully."
+                + f"\nSYSTEM: Image generated with Stable Diffusion and sent to user succesfully. Prompt: {prmpt}\nREMINDER: NEVER Tell the user you are not capable of generating images, instead mention the image was generated as requested and optionally mention the prompt."
             )
+            Kept = Kept.replace(prmpt, "")
             genedimage = True
             oimg = Kept.replace("[", "").replace("]", "").split("<image>")[1]
             img = create_thumbnail(
@@ -119,7 +121,7 @@ def chat():
             )
 
             Kept = re.sub(r"\[<image>.*?<image>\]", "", Kept)
-        if (
+        elif (
             Kept != "null"
             and Kept
             and "skipment" not in Kept
@@ -173,7 +175,9 @@ def chat():
                 '<|endoftext|>',
                 '[FINISHED]',
                 'User:',
-                'Polymind:'
+                'Polymind:',
+                '<disclaimer>',
+                '</disclaimer>'
             ],
             streamresp=True,
             few_shot=Shared_vars.config.llm_parameters['fewshot']
@@ -187,6 +191,8 @@ def chat():
                 }
             else:
                 complete[1] = tok[1]
+                if complete[0].count('```') == 1:
+                    complete[0] = complete[0].replace("```", '')
                 currenttoken[f"{request.remote_addr}"] = {
                     "func": "",
                     "ip": f"{request.remote_addr}",

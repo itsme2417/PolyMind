@@ -109,6 +109,8 @@ def verifyFunc(result, x, input, stopstrings):
             .replace("<startfunc>", "")
             .replace("</", "")
             .replace("<", "")
+            .replace("False", "false")
+            .replace("True", "true")
         )
         print(f'Updated function call: {content}')
     except Exception as e:
@@ -186,6 +188,8 @@ def GateKeep(input, ip, depth=0, stream=False):
             .replace("<startfunc>", "")
             .replace("</", "")
             .replace("<", "")
+            .replace("False", "false")
+            .replace("True", "true")
         )
         print(content)
         result = ""
@@ -293,7 +297,17 @@ def Util(rsp, ip, depth):
     elif rsp["function"] == "generateimage":
         if Shared_vars.config.enabled_features["imagegeneration"]["enabled"] == False:
             return "Image generation is currently disabled."
-        return imagegen(params["prompt"])
+        removebg = False
+        if Shared_vars.config.enabled_features["imagegeneration"]["automatic_background_removal"] and "removebg" in params:
+            if type(params['removebg']) == str:
+                if params['removebg'].lower() == 'true':
+                    removebg = True
+            elif type(params['removebg']) == bool:
+                if params['removebg']:
+                    removebg = True
+            else:
+                removebg = False
+        return imagegen(params["prompt"], removebg)
 
     elif rsp["function"] == "searchfile":
         file = Shared_vars.loadedfile[ip]
