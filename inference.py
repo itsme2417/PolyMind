@@ -81,7 +81,7 @@ def infer(
         + f"\n{esysep}\n"
         + few_shot
         + "".join(memory)
-        + f"\n{beginsep} {username} {prmpt} {endsep} {modelname}"
+        + f"\n{beginsep} {username} {prmpt}{endsep} {modelname}"
     )
     # This feels wrong.
 

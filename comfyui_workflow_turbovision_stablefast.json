@@ -1,14 +1,14 @@
 {
   "3": {
     "inputs": {
-      "seed": 381585947415649,
+      "seed": 1003222816233728,
       "steps": 4,
       "cfg": 1.5,
       "sampler_name": "dpmpp_sde",
       "scheduler": "karras",
       "denoise": 1,
       "model": [
-        "10",
+        "11",
         0
       ],
       "positive": [
@@ -115,6 +115,22 @@
     "class_type": "ApplyStableFastUnet",
     "_meta": {
       "title": "Apply StableFast Unet"
+    }
+  },
+  "11": {
+    "inputs": {
+      "b1": 1.1,
+      "b2": 1.1500000000000001,
+      "s1": 0.85,
+      "s2": 0.35000000000000003,
+      "model": [
+        "10",
+        0
+      ]
+    },
+    "class_type": "FreeU_V2",
+    "_meta": {
+      "title": "FreeU_V2"
     }
   }
 }
