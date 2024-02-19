@@ -104,6 +104,7 @@ def scrape_site(url, max_tokens):
 
         text = text.strip()
         #text = text.replace("\n", "")
+        text = url + "\n" + text
         print("BEFORE SHORTENING:", text)
         text, token_count = shorten_text(text, max_tokens)
         print("AFTER SHORTENING:", text)
