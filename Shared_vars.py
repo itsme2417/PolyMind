@@ -66,8 +66,8 @@ if config.compat:
     sys.exit()
 if (
     config.enabled_features["wolframalpha"]["enabled"]
-    and config.enabled_features["wolframalpha"]["app_id"] == ""
-    or config.enabled_features["wolframalpha"]["app_id"] == "your-wolframalpha-app-id"
+    and (config.enabled_features["wolframalpha"]["app_id"] == ""
+    or config.enabled_features["wolframalpha"]["app_id"] == "your-wolframalpha-app-id")
 ):
     config.enabled_features["wolframalpha"]["enabled"] = False
     print(

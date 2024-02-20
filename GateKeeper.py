@@ -80,7 +80,7 @@ def get_image_size(url):
     return img.size[0] + img.size[1]
 
 def verifyFunc(result, x, input, stopstrings):
-    systemprompt=f'''Context: {result}.\nUpdate the following function call according to the newly obtained context and taking into consideration the user input.\nFunction call: {x}\nProvide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.'''
+    systemprompt=f'''Context: {result}.\nUpdate the following function call according to the newly obtained context and taking into consideration the user input.\nFunction call: {x}\nProvide your response in valid JSON format surrounded by "<startfunc>" and "<endfunc>" without any notes, comments or follow-ups. Only JSON.'''
     content = 'Output:\n<startfunc>\n{\n  "function": "' + f'{x["function"]}",\n"params":' + " {"
     content += next(
         infer(

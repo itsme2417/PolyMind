@@ -1,9 +1,9 @@
-from bs4 import BeautifulSoup
 from urllib.request import Request, urlopen
 from curl_cffi import requests
 import Shared_vars
 from PyPDF2 import PdfReader
 import io
+from trafilatura import extract
 if Shared_vars.config.compat:
     from transformers import AutoTokenizer
     tokenizer = AutoTokenizer.from_pretrained(Shared_vars.config.tokenmodel)
@@ -97,11 +97,7 @@ def scrape_site(url, max_tokens):
             for x in get_pdf_from_url(url).pages:
                 text += x.extract_text()
         else:
-            
-            #soup = BeautifulSoup(response.text, "lxml")
-            #text = soup.get_text()
             text = extract(response.text)
-
         text = text.strip()
         #text = text.replace("\n", "")
         text = url + "\n" + text

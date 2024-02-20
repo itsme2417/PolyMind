@@ -21,4 +21,5 @@ onnxruntime-gpu==1.16.3
 pandas==2.1.2
 einops==0.7.0
 timm==0.9.12
+ultralytics==8.1.6
 trafilatura==1.7.0
