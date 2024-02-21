@@ -37,6 +37,7 @@
         "file_input": {
             "enabled": true,
             "chunk_size": 250,
+            "retrieval_count": 1,
             "raw_input": false
         },
         "imagegeneration": {

@@ -111,7 +111,7 @@ def chat():
             prmpt = Kept.split("[<image>")[0]
             newinp += (
                 answers.strip()
-                + f"\nSYSTEM: Image generated with Stable Diffusion and sent to user succesfully. Prompt: {prmpt}\nREMINDER: NEVER Tell the user you are not capable of generating images, instead mention the image was generated as requested and optionally mention the prompt."
+                + f"\nSYSTEM: Image generated with Stable Diffusion and sent to user succesfully. Prompt: {prmpt}\nREMINDER: NEVER Tell the user you are not capable of generating images, instead mention the image was generated as requested and optionally mention the prompt. Do not include an example link nor a note."
             )
             Kept = Kept.replace(prmpt, "")
             genedimage = True

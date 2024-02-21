@@ -43,6 +43,7 @@ class NumpyEncoder(json.JSONEncoder):
             return obj.tolist()
         return json.JSONEncoder.default(self, obj)
 
+
 def cos_sim(a: Tensor, b: Tensor) -> Tensor: #from sentence-transformers
     """
     Computes the cosine similarity cos_sim(a[i], b[j]) for all i and j.
@@ -64,6 +65,7 @@ def cos_sim(a: Tensor, b: Tensor) -> Tensor: #from sentence-transformers
     a_norm = torch.nn.functional.normalize(a, p=2, dim=1)
     b_norm = torch.nn.functional.normalize(b, p=2, dim=1)
     return torch.mm(a_norm, b_norm.transpose(0, 1))
+
 
 def split_into_chunks(text, N):
     tokens = tokenize(text)
@@ -116,7 +118,10 @@ def queryEmbeddings(query, embeddings, chunks):
         simil.append([cossim, chunks[i]])
 
     all_sentence_combinations = sorted(simil, key=lambda x: x[0], reverse=True)
-    return all_sentence_combinations[0]
+    if config.enabled_features["file_input"]["retrieval_count"] > 0:
+        return all_sentence_combinations[:config.enabled_features["file_input"]["retrieval_count"]]
+    else:
+        return [all_sentence_combinations[0]]
 
 
 def handleFile(file):

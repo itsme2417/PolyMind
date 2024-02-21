@@ -58,6 +58,11 @@ TABBY = True if config.backend == "tabbyapi" else False
 address = "0.0.0.0" if config.listen else "127.0.0.1"
 loadedfile = {}
 
+if not "retrieval_count" in config.enabled_features["file_input"] and config.enabled_features["file_input"]["enabled"]:
+    print(
+        "\033[91mERROR: retrieval_count missing from file_input config, Update your config, Exiting... \033[0m"
+    )        
+    sys.exit()
 if config.compat:
     if config.tokenmodel == "":
         print(

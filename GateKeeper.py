@@ -312,8 +312,11 @@ def Util(rsp, ip, depth):
     elif rsp["function"] == "searchfile":
         file = Shared_vars.loadedfile[ip]
         searchinput = params["query"]
+        result = ""
         print(f"Using query: {searchinput}")
-        return f"<FILE_CHUNK {queryEmbeddings(searchinput, file[0], file[1])[1]} >"
+        for x in queryEmbeddings(searchinput, file[0], file[1]):
+            result += f"<FILE_CHUNK {x[1]} >\n"
+        return result
 
     elif rsp["function"] == "runpythoncode":
         if Shared_vars.config.enabled_features["runpythoncode"]["enabled"] == False:
