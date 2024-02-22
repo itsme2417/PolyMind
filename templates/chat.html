@@ -489,8 +489,7 @@
             const messages = document.querySelectorAll('.assistant-output, .user-input');
             const messagesCount = messages.length;
             const messageHeight = 50; // Approximate height of a single message
-            const newHeight = Math.max(messagesCount * messageHeight, 800); // Set a minimum height of 800 pixels
-            outputDiv.style.height = `${newHeight}px`;
+            outputDiv.style.maxHeight = `90vh`;
         }
         function adjustTextareaHeight() {
             var sendButton = document.querySelector('.btn-primary');
