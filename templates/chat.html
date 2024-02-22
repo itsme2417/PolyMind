@@ -1,508 +1,445 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PolyMind Chat</title>
-    <div id="splash-screen" class="splash-container">
-        <div class="square-container">
-          <svg class="splash-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="0,100 100,100 50,0" />
-          </svg>
-          <div class="splash-text">
-            <h1>PolyMind Chat</h1>
-            <p>Welcome to PolyMind Chat!</p>
-          </div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>PolyMind Chat</title>
+        <div id="splash-screen" class="splash-container">
+            <div class="square-container">
+                <svg
+                    class="splash-logo"
+                    viewBox="0 0 100 100"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <polygon points="0,100 100,100 50,0" />
+                </svg>
+                <div class="splash-text">
+                    <h1>PolyMind Chat</h1>
+                    <p>Welcome to PolyMind Chat!</p>
+                </div>
+            </div>
         </div>
-      </div>
-      <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/@highlightjs/cdn-assets/styles/default.min.css')}}">
-      <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/bootstrap/dist/css/bootstrap.min.css')}}">
-      <style>
-        .splash-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: #1E2021;
-        z-index: 999;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        animation: fadeOut 2s forwards;
-        }
-
-        .square-container {
-        display: flex;
-        flex-direction: column;
-        }
-
-        .splash-logo {
-        width: 100px;
-        height: 100px;
-        fill: #007bff;
-        stroke: none;
-        stroke-width: 0;
-        animation: squareToTriangle 2s forwards;
-        }
-
-        .splash-text {
-        margin-top: 20px;
-        }
-
-        .splash-text h1 {
-        font-size: 2rem;
-        font-weight: bold;
-        }
-
-        .splash-text p {
-        font-size: 1.2rem;
-        }
-        @keyframes squareToTriangle {
-        0% {
-            points: 0,100 100,100 50,0;
-        }
-        50% {
-            points: 0,100 100,0 50,100;
-        }
-        100% {
-            points: 0,0 100,0 50,100;
-        }
-        }
-
-
-        @keyframes fadeOut {
-        0% {
-            opacity: 1;
-            visibility: visible;
-        }
-        100% {
-            opacity: 0;
-            visibility: hidden;
-        }
-        }
-
-        .chat-container {
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #f5f5f5;
-        }
-        .output-container {
-            overflow-y: auto;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 10px;
-        }
-        .user-input {
-            background-color: #e0e0e0;
-            margin-left: 30px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 10px;
-            position: relative;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .assistant-output {
-            background-color: #bde0c8;
-            margin-right: 30px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 10px;
-            position: relative;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .input-group {
-            display: flex;
-            align-items: center;
-        }
-        .loading-spinner {
-            display: none;
-            margin-left: 10px;
-        }
-
-        .spinner-border {
-            width: 2rem;
-            height: 2rem;
-            border: 0.25em solid rgba(0, 0, 0, 0.125);
-            border-left-color: #007bff;
-            border-radius: 50%;
-            animation: rotate 1s linear infinite;
-        }
-
-        @keyframes rotate {
-        0% {
-            transform: rotate(0deg);
-        }
-        100% {
-            transform: rotate(360deg);
-        }
-        }
-
-        .button-spacing {
-            margin-right: 5px;
-        }
-
-        code {
-            padding: 5px;
-            border-radius: 5px;
-            background-color: #f5f5f5;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            word-break: normal;
-        }
-        pre {
-            margin: 0;
-            padding: 0;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            word-break: normal;
-        }
-        .loading-circle {
-            width: 1em; /* same as font-size */
-            height: 1em; /* same as font-size */
-            display: inline-block; /* to place it in line with text */
-            vertical-align: middle; /* to align it with the text */
-            transform: rotate(-90deg);
-        }
-
-        .circle-bg {
-            fill: none;
-            stroke: #eee;
-            stroke-width: 0.6em; /* increased for visibility */
-        }
-
-        .circle {
-            fill: none;
-            stroke: #3498db;
-            stroke-width: 0.6em; /* increased for visibility */
-            stroke-dasharray: 283; /* this value might need to be adjusted */
-            stroke-dashoffset: 283; /* this value might need to be adjusted */
-            animation: fill 6s infinite alternate ease-in-out;
-        }
-
-        @keyframes fill {
-            to {
-                stroke-dashoffset: 0;
-            }
-        }
-        
-    </style>
-    
-</head>
-<body>
-    <div class="container-fluid chat-container">
-        <div class="row">
-            <div class="col-12">
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='node_modules/@highlightjs/cdn-assets/styles/default.min.css')}}"
+        />
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='node_modules/bootstrap/dist/css/bootstrap.min.css')}}"
+        />
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='chat.min.css')}}"
+        />
+    </head>
+    <body>
+        <div class="container-fluid chat-container">
+            <div class="chat-row-chat">
                 <div class="output-container" id="output">
                     <!-- Chat output will be inserted here -->
                 </div>
             </div>
-            <div class="col-12">
+            <div class="chat-row-input">
                 <form method="post">
                     <div class="input-group">
-                        <textarea name="input" class="form-control" placeholder="Type your message here..." autocomplete="off"></textarea>
-                        <button type="submit" class="btn btn-primary button-spacing">Send</button>
-                        <button type="button" class="btn btn-secondary button-spacing" id="upload-image-button">File</button>
-                        <div class="loading-spinner spinner-border" role="status">
+                        <textarea
+                            name="input"
+                            class="form-control rounding"
+                            placeholder="Type your message here..."
+                            autocomplete="off"
+                        ></textarea>
+                        <button type="submit" class="btn btn-primary rounding">
+                            Send
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-secondary rounding"
+                            id="upload-image-button"
+                        >
+                            File
+                        </button>
+                        <div
+                            class="loading-spinner spinner-border"
+                            role="status"
+                        >
                             <span class="visually-hidden">Loading...</span>
-                          </div>
-                          
+                        </div>
                     </div>
                 </form>
-                
             </div>
         </div>
-    </div>
-    <script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.min.js')}}"></script>
-    <script src="{{ url_for('static', filename='node_modules/marked/lib/marked.umd.js')}}"></script>
-    <script src="{{ url_for('static', filename='node_modules/@highlightjs/cdn-assets/highlight.min.js')}}"></script>
-    <script src="{{ url_for('static', filename='node_modules/marked-highlight/lib/index.umd.js')}}"></script>
-    <script src="{{ url_for('static', filename='node_modules/darkreader/darkreader.js')}}"></script>
-    <script>
-        DarkReader.auto({
-            brightness: 100,
-            contrast: 100,
-            sepia: 0
-        });
+        <script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.min.js')}}"></script>
+        <script src="{{ url_for('static', filename='node_modules/marked/lib/marked.umd.js')}}"></script>
+        <script src="{{ url_for('static', filename='node_modules/@highlightjs/cdn-assets/highlight.min.js')}}"></script>
+        <script src="{{ url_for('static', filename='node_modules/marked-highlight/lib/index.umd.js')}}"></script>
+        <script src="{{ url_for('static', filename='node_modules/darkreader/darkreader.js')}}"></script>
+        <script>
+            DarkReader.auto({
+                brightness: 100,
+                contrast: 100,
+                sepia: 0,
+            });
 
-        const outputDiv = document.getElementById('output');
-        var userIp = "{{ user_ip }}";
-        var ran = false;
-        var source = new EventSource('/stream');
-        var shownmsg = false;
-        var currentfunction;
-        var currentmsg;
-        var finished;
-        var pasttoken;
+            const outputDiv = document.getElementById("output");
+            var userIp = "{{ user_ip }}";
+            var ran = false;
+            var source = new EventSource("/stream");
+            var shownmsg = false;
+            var currentfunction;
+            var currentmsg;
+            var finished;
+            var pasttoken;
 
-        source.onmessage = function(event) {
-            // Handle incoming messages
-            var jsondata = JSON.parse(event.data)[userIp]
-            
-            if (userIp == jsondata.ip){
+            source.onmessage = function (event) {
+                // Handle incoming messages
+                var jsondata = JSON.parse(event.data)[userIp];
 
-                if (jsondata.func != "" && jsondata.func != "acknowledge" && (!ran || jsondata.func !=currentfunction)){
-                    var loader = `<svg class="loading-circle" viewBox="0 0 100 100">
+                if (userIp == jsondata.ip) {
+                    if (
+                        jsondata.func != "" &&
+                        jsondata.func != "acknowledge" &&
+                        (!ran || jsondata.func != currentfunction)
+                    ) {
+                        var loader = `<svg class="loading-circle" viewBox="0 0 100 100">
                             <circle class="circle-bg" cx="50" cy="50" r="45"></circle>
                             <circle class="circle" cx="50" cy="50" r="45"></circle>
-                        </svg>`
-                    currentfunction = jsondata.func    
-                    switch (jsondata.func) {
-                        case 'internetsearch':
-                            if (!shownmsg)
-                                shownmsg = appendOutput(loader + '<span><small> Searching the internet' + "</small></span>" , false);
-                            else
-                                shownmsg.innerHTML = loader + '<span><small> Searching the internet' + "</small></span>"
-                            ran = true
-                            break;
-                        case 'portscan':
-                            if (!shownmsg)
-                                shownmsg = appendOutput(loader + '<span><small> Scanning for ports' + "</small></span>" , false);
-                            else
-                                shownmsg.innerHTML = loader + '<span><small> Scanning for ports' + "</small></span>"
-                            ran = true
-                            break;
-                        case 'wolframalpha':
-                            if (!shownmsg)
-                                shownmsg = appendOutput(loader + '<span><small> Using wolfram|alpha' + "</small></span>" , false);
-                            else
-                                shownmsg.innerHTML = loader + '<span><small> Using wolfram|alpha' + "</small></span>"
-                            ran = true
-                            break;
-                        case 'runpythoncode':
-                            if (!shownmsg)
-                                shownmsg = appendOutput(loader + '<span><small> Running code' + "</small></span>", false);
-                            else
-                                shownmsg.innerHTML = loader + '<span><small> Running code' + "</small></span>";
-                            ran = true;
-                            break;
-                        case 'generateimage':
-                            if (!shownmsg)
-                                shownmsg = appendOutput(loader + '<span><small> Generating an image' + "</small></span>", false);
-                            else
-                                shownmsg.innerHTML = loader + '<span><small> Generating an image' + "</small></span>";
-                            ran = true;
-                            break;
-                        case 'searchfile':
-                            if (!shownmsg)
-                                shownmsg = appendOutput(loader + '<span><small> Performing RAG' + "</small></span>", false);
-                            else
-                                shownmsg.innerHTML = loader + '<span><small> Performing RAG' + "</small></span>";
-                            ran = true;
-                            break;
-                        case 'loadembed':
-                            if (!shownmsg)
-                                shownmsg = appendOutput(loader + '<span><small> Creating Embeddings' + "</small></span>", false);
-                            else
-                                shownmsg.innerHTML = loader + '<span><small> Creating Embeddings' + "</small></span>";
-                            ran = true;
-                            break;
-                        case 'procimg':
-                            if (!shownmsg)
-                                shownmsg = appendOutput(loader + '<span><small> Processing image' + "</small></span>", false);
-                            else
-                                shownmsg.innerHTML = loader + '<span><small> Processing image' + "</small></span>";
-                            ran = true;
-                            break;
-                        default:
-                            break;
-                    }
-                } 
-                else if (jsondata.token != "" && jsondata.token != undefined){
-                    if (!finished){
-                        
-                        if (jsondata.token != pasttoken){
-                            if (jsondata.token.endsWith("</s><s>")){
-                                finished = true
-                                currentmsg.style.display = '';
-                                currentmsg.innerHTML = marked.parse(jsondata.token.replace("</s><s>", ""))
-                                hljs.highlightAll();
-                            }
-                            else{
-                                currentmsg.style.display = '';
-                                currentmsg.innerHTML = marked.parse(jsondata.token)
-                            }
+                        </svg>`;
+                        currentfunction = jsondata.func;
+                        switch (jsondata.func) {
+                            case "internetsearch":
+                                if (!shownmsg)
+                                    shownmsg = appendOutput(
+                                        loader +
+                                            "<span><small> Searching the internet" +
+                                            "</small></span>",
+                                        false
+                                    );
+                                else
+                                    shownmsg.innerHTML =
+                                        loader +
+                                        "<span><small> Searching the internet" +
+                                        "</small></span>";
+                                ran = true;
+                                break;
+                            case "portscan":
+                                if (!shownmsg)
+                                    shownmsg = appendOutput(
+                                        loader +
+                                            "<span><small> Scanning for ports" +
+                                            "</small></span>",
+                                        false
+                                    );
+                                else
+                                    shownmsg.innerHTML =
+                                        loader +
+                                        "<span><small> Scanning for ports" +
+                                        "</small></span>";
+                                ran = true;
+                                break;
+                            case "wolframalpha":
+                                if (!shownmsg)
+                                    shownmsg = appendOutput(
+                                        loader +
+                                            "<span><small> Using wolfram|alpha" +
+                                            "</small></span>",
+                                        false
+                                    );
+                                else
+                                    shownmsg.innerHTML =
+                                        loader +
+                                        "<span><small> Using wolfram|alpha" +
+                                        "</small></span>";
+                                ran = true;
+                                break;
+                            case "runpythoncode":
+                                if (!shownmsg)
+                                    shownmsg = appendOutput(
+                                        loader +
+                                            "<span><small> Running code" +
+                                            "</small></span>",
+                                        false
+                                    );
+                                else
+                                    shownmsg.innerHTML =
+                                        loader +
+                                        "<span><small> Running code" +
+                                        "</small></span>";
+                                ran = true;
+                                break;
+                            case "generateimage":
+                                if (!shownmsg)
+                                    shownmsg = appendOutput(
+                                        loader +
+                                            "<span><small> Generating an image" +
+                                            "</small></span>",
+                                        false
+                                    );
+                                else
+                                    shownmsg.innerHTML =
+                                        loader +
+                                        "<span><small> Generating an image" +
+                                        "</small></span>";
+                                ran = true;
+                                break;
+                            case "searchfile":
+                                if (!shownmsg)
+                                    shownmsg = appendOutput(
+                                        loader +
+                                            "<span><small> Performing RAG" +
+                                            "</small></span>",
+                                        false
+                                    );
+                                else
+                                    shownmsg.innerHTML =
+                                        loader +
+                                        "<span><small> Performing RAG" +
+                                        "</small></span>";
+                                ran = true;
+                                break;
+                            case "loadembed":
+                                if (!shownmsg)
+                                    shownmsg = appendOutput(
+                                        loader +
+                                            "<span><small> Creating Embeddings" +
+                                            "</small></span>",
+                                        false
+                                    );
+                                else
+                                    shownmsg.innerHTML =
+                                        loader +
+                                        "<span><small> Creating Embeddings" +
+                                        "</small></span>";
+                                ran = true;
+                                break;
+                            case "procimg":
+                                if (!shownmsg)
+                                    shownmsg = appendOutput(
+                                        loader +
+                                            "<span><small> Processing image" +
+                                            "</small></span>",
+                                        false
+                                    );
+                                else
+                                    shownmsg.innerHTML =
+                                        loader +
+                                        "<span><small> Processing image" +
+                                        "</small></span>";
+                                ran = true;
+                                break;
+                            default:
+                                break;
                         }
-                        pasttoken = jsondata.token
+                    } else if (
+                        jsondata.token != "" &&
+                        jsondata.token != undefined
+                    ) {
+                        if (!finished) {
+                            if (jsondata.token != pasttoken) {
+                                if (jsondata.token.endsWith("</s><s>")) {
+                                    finished = true;
+                                    currentmsg.style.display = "";
+                                    currentmsg.innerHTML = marked.parse(
+                                        jsondata.token.replace("</s><s>", "")
+                                    );
+                                    hljs.highlightAll();
+                                } else {
+                                    currentmsg.style.display = "";
+                                    currentmsg.innerHTML = marked.parse(
+                                        jsondata.token
+                                    );
+                                }
+                            }
+                            pasttoken = jsondata.token;
+                        }
+                    } else {
+                        finished = false;
+                        if (!ran && shownmsg) {
+                            outputDiv.removeChild(shownmsg);
+                            shownmsg = false;
+                        }
                     }
                 }
-                else {
-                    finished = false
-                    if (!ran && shownmsg){
-                        outputDiv.removeChild(shownmsg);
-                        shownmsg = false
-                    }
-                };
             };
-        }
 
-        function appendOutput(message, isUserInput, isHidden = false) {
-            let parsedMessage = message
-            const p = document.createElement('p');
-            if (!isUserInput) {
-                parsedMessage = marked.parse(parsedMessage);
-                p.innerHTML = parsedMessage;
-                p.className = 'assistant-output';
-            } else {
-                p.innerText = parsedMessage;
-                p.className = 'user-input';
+            function appendOutput(message, isUserInput, isHidden = false) {
+                let parsedMessage = message;
+                const p = document.createElement("p");
+                if (!isUserInput) {
+                    parsedMessage = marked.parse(parsedMessage);
+                    p.innerHTML = parsedMessage;
+                    p.className = "assistant-output";
+                } else {
+                    p.innerText = parsedMessage;
+                    p.className = "user-input";
+                }
+                if (isHidden) {
+                    p.style.display = "none"; // Hide the paragraph
+                }
+                outputDiv.appendChild(p);
+                outputDiv.scrollTop = outputDiv.scrollHeight;
+                return p;
             }
-            if (isHidden) {
-                p.style.display = 'none'; // Hide the paragraph
-            }
-            outputDiv.appendChild(p);
-            outputDiv.scrollTop = outputDiv.scrollHeight;
-            return p
-        }
 
-        window.onload = function() {
-            adjustTextareaHeight()
-            fetch('/chat_history')
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(chatItem => {
-                        try {
-                            if (!chatItem['user'].includes("<image>Description:")){
-                                appendOutput(chatItem['user'], true); // Display user input messages
-                                appendOutput(chatItem['assistant'], false); // Display assistant response messages
-                                hljs.highlightAll();
-                            }
-                        } catch { };
+            window.onload = function () {
+                adjustTextareaHeight();
+                fetch("/chat_history")
+                    .then((response) => response.json())
+                    .then((data) => {
+                        data.forEach((chatItem) => {
+                            try {
+                                if (
+                                    !chatItem["user"].includes(
+                                        "<image>Description:"
+                                    )
+                                ) {
+                                    appendOutput(chatItem["user"], true); // Display user input messages
+                                    appendOutput(chatItem["assistant"], false); // Display assistant response messages
+                                    hljs.highlightAll();
+                                }
+                            } catch {}
+                        });
+                        adjustOutputContainerHeight();
                     });
-                    adjustOutputContainerHeight();
-                });
-        }
+            };
 
-        // Send user input and display the response
-        const form = document.querySelector('form');
-        const textArea = document.querySelector('textarea[name="input"]');
-        const loadingSpinner = document.querySelector('.loading-spinner');
-        const uploadImageButton = document.querySelector('#upload-image-button');
+            // Send user input and display the response
+            const form = document.querySelector("form");
+            const textArea = document.querySelector('textarea[name="input"]');
+            const loadingSpinner = document.querySelector(".loading-spinner");
+            const uploadImageButton = document.querySelector(
+                "#upload-image-button"
+            );
 
-        textArea.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                form.requestSubmit();
-            }
-        });
-
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const userInput = textArea.value;
-            if (userInput != ""){
-                appendOutput(userInput, true);
-                loadingSpinner.style.display = 'block'; // Show loading spinner
-                document.querySelector('textarea[name="input"]').value = '';
-                currentmsg = appendOutput("", false, true);
-                fetch('/', {
-                    method: 'POST',
-                    body: new URLSearchParams({ 'input': userInput }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.output.trim() !== '') {
-                        data.output.split('--newline--').forEach(message => {
-                            message = marked.parse(message);
-                            ran = false
-                        });
-                        document.querySelector('textarea[name="input"]').value = '';
-                    }
-                    loadingSpinner.style.display = 'none'; // Hide loading spinner
-                    outputDiv.scrollTop = outputDiv.scrollHeight;
-                    adjustOutputContainerHeight();
-
-                    if (data.base64_image) {
-                        const base64Image = `${data.base64_image}`;
-                        const base64ImageFull = "data:image/jpeg;base64," + data.base64_image_full
-                        const imageElement = document.createElement('img');
-                        imageElement.src = base64Image;
-                        imageElement.alt = 'Uploaded image';
-                        imageElement.className = 'uploaded-image';
-                        imageElement.style.border = '1px solid black';
-                        imageElement.style.padding = '5px';
-                        imageElement.style.cursor = 'pointer'; // Change cursor to indicate the image is clickable
-                        outputDiv.appendChild(imageElement);
-                        outputDiv.scrollTop = outputDiv.scrollHeight;
-
-                        // Add click event listener to swap to full version of the image
-                        imageElement.addEventListener('click', function() {
-                            // Check if the current src is the base64Image, if so, swap to base64ImageFull
-                            if (imageElement.src === base64Image) {
-                                imageElement.src = base64ImageFull;
-                            } else {
-                                // If already showing the full version, swap back to the smaller version
-                                imageElement.src = base64Image;
-                            }
-                        });
-                    }
-                });
-            }
-        });
-
-        uploadImageButton.addEventListener('click', function() {
-            const fileInput = document.createElement('input');
-            fileInput.type = 'file';
-            fileInput.accept = '*';
-
-            fileInput.addEventListener('change', function(event) {
-                const file = event.target.files[0];
-
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const fileContent = event.target.result;
-                        const formData = new FormData();
-                        formData.append('file', file);
-                        formData.append('content', fileContent);
-                        fetch('/upload_file', {
-                            method: 'POST',
-                            body: formData,
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.base64_image) {
-                                const base64Image = `${data.base64_image}`;
-                                const imageElement = document.createElement('img');
-                                imageElement.src = base64Image;
-                                imageElement.alt = 'Uploaded image';
-                                imageElement.className = 'uploaded-image';
-                                imageElement.style.border = '1px solid black';
-                                imageElement.style.padding = '5px';
-                                outputDiv.appendChild(imageElement);
-                                outputDiv.scrollTop = outputDiv.scrollHeight;
-                            } else {
-                                appendOutput(data.message, true);
-                                ran = false
-                            }
-                        });
-                    };
-                    reader.readAsDataURL(file);
+            textArea.addEventListener("keydown", function (event) {
+                if (event.key === "Enter" && !event.shiftKey) {
+                    event.preventDefault();
+                    form.requestSubmit();
                 }
             });
 
-            fileInput.click();
-        });
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();
+                const userInput = textArea.value;
+                if (userInput != "") {
+                    appendOutput(userInput, true);
+                    loadingSpinner.style.display = "block"; // Show loading spinner
+                    document.querySelector('textarea[name="input"]').value = "";
+                    currentmsg = appendOutput("", false, true);
+                    fetch("/", {
+                        method: "POST",
+                        body: new URLSearchParams({ input: userInput }),
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.output.trim() !== "") {
+                                data.output
+                                    .split("--newline--")
+                                    .forEach((message) => {
+                                        message = marked.parse(message);
+                                        ran = false;
+                                    });
+                                document.querySelector(
+                                    'textarea[name="input"]'
+                                ).value = "";
+                            }
+                            loadingSpinner.style.display = "none"; // Hide loading spinner
+                            outputDiv.scrollTop = outputDiv.scrollHeight;
+                            adjustOutputContainerHeight();
 
-        function adjustOutputContainerHeight() {
-            const messages = document.querySelectorAll('.assistant-output, .user-input');
-            const messagesCount = messages.length;
-            const messageHeight = 50; // Approximate height of a single message
-            outputDiv.style.maxHeight = `90vh`;
-        }
-        function adjustTextareaHeight() {
-            var sendButton = document.querySelector('.btn-primary');
-            var fileButton = document.querySelector('.btn-secondary');
-            var textarea = document.querySelector('textarea[name="input"]');
+                            if (data.base64_image) {
+                                const base64Image = `${data.base64_image}`;
+                                const base64ImageFull =
+                                    "data:image/jpeg;base64," +
+                                    data.base64_image_full;
+                                const imageElement =
+                                    document.createElement("img");
+                                imageElement.src = base64Image;
+                                imageElement.alt = "Uploaded image";
+                                imageElement.className = "uploaded-image";
+                                imageElement.style.border = "1px solid black";
+                                imageElement.style.padding = "5px";
+                                imageElement.style.cursor = "pointer"; // Change cursor to indicate the image is clickable
+                                outputDiv.appendChild(imageElement);
+                                outputDiv.scrollTop = outputDiv.scrollHeight;
 
-            if (sendButton && fileButton && textarea) {
-                var buttonHeight = Math.max(sendButton.offsetHeight, fileButton.offsetHeight);
-                textarea.style.height = buttonHeight + 'px';
+                                // Add click event listener to swap to full version of the image
+                                imageElement.addEventListener(
+                                    "click",
+                                    function () {
+                                        // Check if the current src is the base64Image, if so, swap to base64ImageFull
+                                        if (imageElement.src === base64Image) {
+                                            imageElement.src = base64ImageFull;
+                                        } else {
+                                            // If already showing the full version, swap back to the smaller version
+                                            imageElement.src = base64Image;
+                                        }
+                                    }
+                                );
+                            }
+                        });
+                }
+            });
+
+            uploadImageButton.addEventListener("click", function () {
+                const fileInput = document.createElement("input");
+                fileInput.type = "file";
+                fileInput.accept = "*";
+
+                fileInput.addEventListener("change", function (event) {
+                    const file = event.target.files[0];
+
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (event) {
+                            const fileContent = event.target.result;
+                            const formData = new FormData();
+                            formData.append("file", file);
+                            formData.append("content", fileContent);
+                            fetch("/upload_file", {
+                                method: "POST",
+                                body: formData,
+                            })
+                                .then((response) => response.json())
+                                .then((data) => {
+                                    if (data.base64_image) {
+                                        const base64Image = `${data.base64_image}`;
+                                        const imageElement =
+                                            document.createElement("img");
+                                        imageElement.src = base64Image;
+                                        imageElement.alt = "Uploaded image";
+                                        imageElement.className =
+                                            "uploaded-image";
+                                        imageElement.style.border =
+                                            "1px solid black";
+                                        imageElement.style.padding = "5px";
+                                        outputDiv.appendChild(imageElement);
+                                        outputDiv.scrollTop =
+                                            outputDiv.scrollHeight;
+                                    } else {
+                                        appendOutput(data.message, true);
+                                        ran = false;
+                                    }
+                                });
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                fileInput.click();
+            });
+            function adjustTextareaHeight() {
+                var sendButton = document.querySelector(".btn-primary");
+                var fileButton = document.querySelector(".btn-secondary");
+                var textarea = document.querySelector('textarea[name="input"]');
+
+                if (sendButton && fileButton && textarea) {
+                    var buttonHeight = Math.max(
+                        sendButton.offsetHeight,
+                        fileButton.offsetHeight
+                    );
+                    textarea.style.height = buttonHeight + "px";
+                }
             }
-        }
-
-    </script>
-
-</body>
+        </script>
+    </body>
 </html>
