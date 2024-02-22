@@ -79,7 +79,7 @@
 }
 
 .chat-row-chat {
-    height: 100%;
+    min-height: 0;
 }
 
 .chat-row-input {
