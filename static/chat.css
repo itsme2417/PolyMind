@@ -1,3 +1,23 @@
+::-webkit-scrollbar {
+    width: 10px;
+    background-color: #00000000;
+}
+
+::-webkit-scrollbar-track {
+    background: #00000000;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgb(42, 45, 47);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgb(58, 62, 65);
+    border-radius: 10px;
+}
+
 .splash-container {
     position: fixed;
     top: 0;
@@ -80,6 +100,7 @@
 
 .chat-row-chat {
     min-height: 0;
+    height: 100%;
 }
 
 .chat-row-input {
