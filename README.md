@@ -25,7 +25,7 @@ Note: When using RAG, make it clear that you are requesting information accordin
 3. Install the required node modules: `cd static && npm install`
 4. Copy `config.example.json` as `config.json` and fill in required settings.
 
-For ComfyUI, the selected workflow might be set on [Line 100 of comfyui.py](https://github.com/itsme2417/PolyMind/blob/main/comfyui.py#L100). For the stablefast workflow, make sure to have [ComfyUI_stable_fast](https://github.com/gameltb/ComfyUI_stable_fast) installed.
+For the ComfyUI stablefast workflow, make sure to have [ComfyUI_stable_fast](https://github.com/gameltb/ComfyUI_stable_fast) installed.
 ## Usage
 
 To use PolyMind, run the following command in the project directory:

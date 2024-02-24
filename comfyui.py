@@ -26,20 +26,9 @@ if Shared_vars.config.enabled_features["imagegeneration"]["automatic_background_
     pipe = pipeline("image-segmentation", model="briaai/RMBG-1.4",revision ="refs/pr/9", trust_remote_code=True, )
 
 with open(
-    os.path.join(Path(os.path.abspath(__file__)).parent, "comfyui_workflow_lcm.json")
-) as workflow:
-    prompt_text_lcm = json.load(workflow)
-with open(
-    os.path.join(
-        Path(os.path.abspath(__file__)).parent, "comfyui_workflow_turbovision.json"
-    )
-) as workflow:
-    prompt_text_turbovision = json.load(workflow)
-
-with open(
     os.path.join(
         Path(os.path.abspath(__file__)).parent,
-        "comfyui_workflow_turbovision_stablefast.json",
+        Shared_vars.config.enabled_features["imagegeneration"]["comfyui_workflow"],
     )
 ) as workflow:
     prompt_text_turbovision_stablefast = json.load(workflow)

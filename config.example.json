@@ -44,7 +44,8 @@
             "enabled": true,
             "server_address": "127.0.0.1:8188",
             "checkpoint_name": "turbovisionxl431Fp16.p3Q5.safetensors",
-            "automatic_background_removal": false
+            "automatic_background_removal": false,
+            "comfyui_workflow": "comfyui_workflow_turbovision_stablefast.json"
         },
         "wolframalpha": {
             "enabled": true,
