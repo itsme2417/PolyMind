@@ -226,7 +226,10 @@
             contrast: 100,
             sepia: 0
         });
-
+        marked.use({
+            gfm: true,
+            breaks: true,
+        });
         const outputDiv = document.getElementById('output');
         var userIp = "{{ user_ip }}";
         var ran = false;

@@ -1,12 +1,12 @@
 {
   "3": {
     "inputs": {
-      "seed": 1003222816233728,
-      "steps": 4,
-      "cfg": 1.5,
+      "seed": 470221479966927,
+      "steps": 6,
+      "cfg": 4,
       "sampler_name": "dpmpp_sde",
       "scheduler": "karras",
-      "denoise": 1,
+      "denoise": 0.75,
       "model": [
         "11",
         0
@@ -20,7 +20,7 @@
         0
       ],
       "latent_image": [
-        "5",
+        "13",
         0
       ]
     },
@@ -31,27 +31,16 @@
   },
   "4": {
     "inputs": {
-      "ckpt_name": "turbovisionxlV32Fp16.dIUg.safetensors"
+      "ckpt_name": "dreamshaperXLTurbo.safetensors"
     },
     "class_type": "CheckpointLoaderSimple",
     "_meta": {
       "title": "Load Checkpoint"
     }
   },
-  "5": {
-    "inputs": {
-      "width": 1024,
-      "height": 1024,
-      "batch_size": 1
-    },
-    "class_type": "EmptyLatentImage",
-    "_meta": {
-      "title": "Empty Latent Image"
-    }
-  },
   "6": {
     "inputs": {
-      "text": " ~*~Photographic~*~ Pink cat, high quality, (photo)",
+      "text": "drawn bottle, painting, digital art, lineart, black and white, drawing",
       "clip": [
         "4",
         1
@@ -64,7 +53,7 @@
   },
   "7": {
     "inputs": {
-      "text": "watermark, ((blurry)), duplicate, deformed, render, missing limbs, close-up, lowres, low-quality, worst quality, extra (limbs), poorly drawn hands, 480p, 360p, poorly drawn face,  cloned face, disfigured",
+      "text": "watermark, ((blurry)), duplicate, deformed, render, missing limbs, close-up, lowres, low-quality, worst quality, extra (limbs)",
       "clip": [
         "4",
         1
@@ -131,6 +120,31 @@
     "class_type": "FreeU_V2",
     "_meta": {
       "title": "FreeU_V2"
+    }
+  },
+  "13": {
+    "inputs": {
+      "pixels": [
+        "14",
+        0
+      ],
+      "vae": [
+        "4",
+        2
+      ]
+    },
+    "class_type": "VAEEncode",
+    "_meta": {
+      "title": "VAE Encode"
+    }
+  },
+  "14": {
+    "inputs": {
+      "data": ""
+    },
+    "class_type": "LoadImageFromBase64",
+    "_meta": {
+      "title": "Load Image From Base64"
     }
   }
 }

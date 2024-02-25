@@ -3,7 +3,7 @@
 PolyMind is a multimodal, function calling powered LLM webui. It's designed to be used with Mixtral 8x7B-Instruct/Mistral-7B-Instruct-v0.2 + TabbyAPI, but can be used with other models and/or with llama.cpp's included server and, when using the compatiblity mode + tabbyAPI mode, any endpoint with /v1/completions support, and offers a wide range of features including:
 
 - Internet searching with DuckDuckGo and web scraping capabilities.
-- Image generation using comfyui along with optional, function calling controlled, automatic background removal using RMBG-1.4.
+- Image generation using comfyui along with optional, function calling controlled, automatic background removal using RMBG-1.4 and experimental img2img with uploaded images.
 - Image input with sharegpt4v (Over llama.cpp's server)/moondream on CPU, OCR, and Yolo.
 - Port scanning with nmap.
 - Wolfram Alpha integration.
@@ -26,6 +26,8 @@ Note: When using RAG, make it clear that you are requesting information accordin
 4. Copy `config.example.json` as `config.json` and fill in required settings.
 
 For the ComfyUI stablefast workflow, make sure to have [ComfyUI_stable_fast](https://github.com/gameltb/ComfyUI_stable_fast) installed.
+For the img2img workflow, make sure to have [comfyui-base64-to-image](https://github.com/glowcone/comfyui-base64-to-image) installed.
+
 ## Usage
 
 To use PolyMind, run the following command in the project directory:
@@ -60,6 +62,7 @@ The application's configuration is stored in the `config.json` file. Here's a de
 - `file_input/retrieval_count`: Number of chunks to use from the RAG results.
 - `image_input/backend`: If set to `moondream`, will use the moondream model on cpu, if set to `llama.cpp` will use the llama.cpp server running at `URI`.
 - `Plugins`: A list containing the name of enabled plugins, Names should match the folder names in `plugins` and `module_name` from their `manifest.json`. 
+
 ## Donations
 
 Patreon: https://www.patreon.com/llama990

@@ -57,6 +57,7 @@ API_KEY = config.api_key
 TABBY = True if config.backend == "tabbyapi" else False
 address = "0.0.0.0" if config.listen else "127.0.0.1"
 loadedfile = {}
+uploads = {}
 
 if not "retrieval_count" in config.enabled_features["file_input"] and config.enabled_features["file_input"]["enabled"]:
     print(

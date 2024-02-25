@@ -31,8 +31,15 @@ with open(
         Shared_vars.config.enabled_features["imagegeneration"]["comfyui_workflow"],
     )
 ) as workflow:
-    prompt_text_turbovision_stablefast = json.load(workflow)
+    prompt_text = json.load(workflow)
 
+with open(
+    os.path.join(
+        Path(os.path.abspath(__file__)).parent,
+        Shared_vars.config.enabled_features["imagegeneration"]["comfyui_workflow"].replace(".json", "_imgtoimg.json"),
+    )
+) as workflow:
+    prompt_text_imgtoimg = json.load(workflow)
 
 def queue_prompt(prompt, server_address):
     p = {"prompt": prompt, "client_id": client_id}
@@ -90,20 +97,35 @@ def get_images(ws, prompt, server_address):
     return output_images
 
 
-def generate(prmpt, server_address, seed=0, width=1024, height=1024):
-    prompt = prompt_text_turbovision_stablefast
-    prompt["6"]["inputs"]["text"] = prmpt
-    prompt["4"]["inputs"]["ckpt_name"] = Shared_vars.config.enabled_features[
-        "imagegeneration"
-    ]["checkpoint_name"]
-    if not seed == 0:
-        prompt["3"]["inputs"]["seed"] = seed
+def generate(prmpt, server_address, seed=0, width=1024, height=1024, imgtoimg=""):
+    if imgtoimg == "":
+        prompt = prompt_text
+        prompt["6"]["inputs"]["text"] = prmpt
+        prompt["4"]["inputs"]["ckpt_name"] = Shared_vars.config.enabled_features[
+            "imagegeneration"
+        ]["checkpoint_name"]
+        if not seed == 0:
+            prompt["3"]["inputs"]["seed"] = seed
+        else:
+            seeed = random.randint(2000002406736107, 3778562406736107)
+            print(f"Seed: {seeed}")
+            prompt["3"]["inputs"]["seed"] = seeed
+        prompt["5"]["inputs"]["width"] = width
+        prompt["5"]["inputs"]["height"] = height
     else:
-        seeed = random.randint(2000002406736107, 3778562406736107)
-        print(f"Seed: {seeed}")
-        prompt["3"]["inputs"]["seed"] = seeed
-    prompt["5"]["inputs"]["width"] = width
-    prompt["5"]["inputs"]["height"] = height
+        prompt = prompt_text_imgtoimg
+        prompt["6"]["inputs"]["text"] = prmpt
+        prompt["4"]["inputs"]["ckpt_name"] = Shared_vars.config.enabled_features[
+            "imagegeneration"
+        ]["checkpoint_name"]
+        if not seed == 0:
+            prompt["3"]["inputs"]["seed"] = seed
+        else:
+            seeed = random.randint(2000002406736107, 3778562406736107)
+            print(f"Seed: {seeed}")
+            prompt["3"]["inputs"]["seed"] = seeed
+        prompt["14"]["inputs"]["data"] = imgtoimg
+
     ws = websocket.WebSocket()
     ws.connect("ws://{}/ws?clientId={}".format(server_address, client_id))
     images = get_images(ws, prompt, server_address)
@@ -137,9 +159,8 @@ def aspect2res(inp):
         return ["1024", "1024"]
 
 
-def imagegen(msg, removebg = False):
+def imagegen(msg, removebg = False, imgtoimg = ""):
     replyid = False
-    imgtoimg = False
 
     payload = getsdprompts(replyid, msg, imgtoimg)
     chat_completion = openaiclient.chat.completions.create(
@@ -168,6 +189,7 @@ def imagegen(msg, removebg = False):
         Shared_vars.config.enabled_features["imagegeneration"]["server_address"],
         width=res[0],
         height=res[1],
+        imgtoimg=imgtoimg,
     )[0]
     #TODO: Handle images in memory once RMBG is added to transfomers properly.
     if removebg:

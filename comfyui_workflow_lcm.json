@@ -52,7 +52,7 @@
     },
     "7": {
       "inputs": {
-        "text": "watermark, ((blurry)), duplicate, deformed, render, missing limbs, close-up, lowres, low-quality, worst quality, extra (limbs)",
+        "text": "watermark, ((blurry)), duplicate, deformed, render, missing limbs, close-up, lowres, low-quality, worst quality, extra (limbs), poorly drawn hands, 480p, 360p, poorly drawn face,  cloned face, disfigured",
         "clip": [
           "10",
           1

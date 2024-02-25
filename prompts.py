@@ -8,7 +8,7 @@ def getsdprompts(replyid, msg, imgtoimg):
         {"content": systemprompt, "role": "system"},
         {"content": "generate a photo of a black persian cat please", "role": "user"},
         {
-            "content": "1. ~*~Photographic~*~ standing white Persian cat, filmed with a Canon EOS R6, 70-200mm lens, high quality, 8k\n2. ~*~Photographic~*~ standing white Persian cat, photo, filmed with a Canon EOS R6, 70-200mm lens, high quality, 8k",
+            "content": "1. ~*~Photographic~*~ standing white Persian cat, filmed with a Canon EOS R6, 70-200mm lens, high quality, dslr, soft lighting, intricate details, sharp focus, 8k, 4k, UHD, raw\n2. ~*~Photographic~*~ standing white Persian cat, photo, Fujifilm XT3, high quality, dslr, soft lighting, intricate details, sharp focus, 8k, 4k, UHD, raw",
             "role": "assistant",
         },
         {"content": "send me a drawing of a gigantic wizard brain", "role": "user"},
@@ -29,24 +29,24 @@ def getsdprompts(replyid, msg, imgtoimg):
             "role": "user",
         },
         {
-            "content": "1. ~*~Photographic~*~ Frog neighborhood, green pond, trees, rocks, high quality, high quality, filmed with a Canon EOS R6, (photo)\n2. ~*~Photographic~*~, Frog neighborhood, green pond, trees, rocks, high quality, photo, 4k",
+            "content": "1. ~*~Photographic~*~ Frog neighborhood, green pond, trees, rocks, high quality, dslr, soft lighting, intricate details, sharp focus, 8k, 4k, UHD, raw, filmed with a Canon EOS R6, (photo)\n2. ~*~Photographic~*~, Frog neighborhood, green pond, trees, rocks, high quality, photo, dslr, soft lighting, intricate details, sharp focus, 8k, 4k, UHD, raw, Fujifilm XT3",
             "role": "assistant",
         },
-        {"content": "Make the pond red and remove the rocks", "role": "user"},
+        {"content": "A post apocalyptic factory building", "role": "user"},
         {
-            "content": "1.~*~Photographic~*~ Frog neighborhood, red pond, trees, high quality, high quality, filmed with a Canon EOS R6, (photo)\n2. ~*~Photographic~*~, Frog neighborhood, red pond, trees, high quality, photo, 4k",
+            "content": "1. ~*~Photographic~*~ Abandoned factory, foggy, abandoned, desaturated, post-apocalyptic, high quality, dslr, soft lighting, intricate details, sharp focus, 8k, 4k, UHD, raw, (photo), distopic, cinestill, ruin, realistic, hyper detailed, cinematic\n2. ~*~Photographic~*~ Abandoned factory, post-apocalyptic, high quality, dslr, soft lighting, intricate details, sharp focus, 8k, 4k, UHD, raw, distopic, foggy, ruin, realistic, hyper detailed",
             "role": "assistant",
         },
         {
-            "content": "draw me an alien character 3d *Request summary: <imggen>alien character 3d artwork</imggen>*",
+            "content": "draw me a low poly alien character 3d",
             "role": "user",
         },
         {
-            "content": "1.~*~3D model~*~ Alien Character, 3D Style, (drawing), high quality\n2. ~*~3D model~*~, Alien Character, 3D, (drawing), high quality",
+            "content": "1.~*~3D model~*~ Alien Character, 3D Style, low poly, soft lighting, masterpiece, (best quality), polygon, trending on artstation, sharp focus, low poly model, render, 4k, flat colors\n2. ~*~3D model~*~, Alien Character, (low poly), soft lighting, masterpiece, (best quality), polygon, trending on artstation, sharp focus, low poly model, render, 4k",
             "role": "assistant",
         },
         {
-            "content": "generate a pixel art mario holding a gun *Request summary: <drawinggen> mario pixelart with gun</drawinggen>*",
+            "content": "generate a pixel art mario holding a gun",
             "role": "user",
         },
         {
@@ -54,6 +54,34 @@ def getsdprompts(replyid, msg, imgtoimg):
             "role": "assistant",
         },
     ]
+    if imgtoimg != "":
+        basepayload = [
+            {"content": systemprompt, "role": "system"},
+            {
+                "content": "bottle of rainbow beer, black and white lineart",
+                "role": "user"
+            },
+            {
+                "content": "1. drawn bottle, painting, digital art, lineart, (black and white), (drawing)\n2. drawn bottle, painting, digital art, (lineart), black and white, drawing",
+                "role": "assistant"
+            },
+            {
+                "content": "A red tesla model S car driving down a road; ID: 17557; img2img: true",
+                "role": "user"
+            },
+            {
+                "content": "1.  Red Tesla Model S car, high quality\n2. Red Tesla Model S car, high quality, driving down a road",
+                "role": "assistant"
+            },
+            {
+                "content": "3D alien character drawing",
+                "role": "user"
+            },
+            {
+                "content": "1. Alien Character, 3D Style, (drawing), high quality\n2. Alien Character, 3D, (drawing), high quality",
+                "role": "assistant"
+            }
+        ]
     payload = basepayload
 
     payload += [{"content": re.sub(r"\\", "", msg), "role": "user"}]

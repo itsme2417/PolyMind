@@ -111,7 +111,7 @@ def chat():
             prmpt = Kept.split("[<image>")[0]
             newinp += (
                 answers.strip()
-                + f"\nSYSTEM: Image generated with Stable Diffusion and sent to user succesfully. Prompt: {prmpt}\nREMINDER: NEVER Tell the user you are not capable of generating images, instead mention the image was generated as requested and optionally mention the prompt. Do not include an example link nor a note."
+                + f"\nSYSTEM: Image generated with Stable Diffusion and sent to user succesfully. Prompt: {prmpt}\nREMINDER: NEVER Tell the user you are not capable of generating images, instead mention the image was generated as requested and optionally mention the prompt.\nDo not write a description of the image, include an example link nor a note. NEVER write base64. Instead tell the user that the image was generated."
             )
             Kept = Kept.replace(prmpt, "")
             genedimage = True
@@ -177,7 +177,8 @@ def chat():
                 'User:',
                 'Polymind:',
                 '<disclaimer>',
-                '</disclaimer>'
+                '</disclaimer>',
+                'data:image/png;base64,'
             ],
             streamresp=True,
             few_shot=Shared_vars.config.llm_parameters['fewshot']

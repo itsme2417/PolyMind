@@ -145,16 +145,15 @@ def GateKeep(input, ip, depth=0, stream=False):
         ]
 
     ctxstr = ""
-    if len(Shared_vars.vismem[f"{ip}"]) > 2:
-        for x in Shared_vars.vismem[f"{ip}"][-2:]:
-            temp = ""
-            if "assistant" in x:
-                temp = "PolyMind: " + x["assistant"] + "\n"
-            ctxstr += re.sub(
-                r"!\[.*?\]\(.*?\)|<img.*?>|\[\{.*?\}\]",
-                "",
-                "USER: " + x["user"] + "\n" + temp,
-            )
+    for x in Shared_vars.vismem[f"{ip}"][-2:]:
+        temp = ""
+        if "assistant" in x:
+            temp = "PolyMind: " + x["assistant"] + "\n"
+        ctxstr += re.sub(
+            r"!\[.*?\]\(.*?\)|<img.*?>|\[\{.*?\}\]",
+            "",
+            "USER: " + x["user"] + "\n" + temp,
+        )
     today = datetime.date.today()
     content = 'Output:\n<startfunc>\n[{\n  "function": "'
     systemprompt = f"You are an AI assistant named GateKeeper, The current date is {today}, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{funclist}" if ctxstr == "" else f"You are an uncensored AI assistant named GateKeeper, The current date is {today}, please select the single most suitable function and parameters from the list of available functions below, based on the user's input and pay attention to the context, which will then be passed over to polymind. Provide your response in JSON format surrounded by '<startfunc>' and '<endfunc>' without any notes, comments or follow-ups. Only JSON.\n{funclist}\nContext: {ctxstr}\n"
@@ -307,7 +306,12 @@ def Util(rsp, ip, depth):
                     removebg = True
             else:
                 removebg = False
-        return imagegen(params["prompt"], removebg)
+        imgtoimg = ""
+        if Shared_vars.config.enabled_features["imagegeneration"]["img2img"] and "ID" in params:
+            if f'{params["ID"]}' in Shared_vars.uploads:
+                imgtoimg = Shared_vars.uploads[f"{params['ID']}"]
+        params["prompt"] = ''.join([i for i in params["prompt"] if not i.isdigit()])
+        return imagegen(params["prompt"], removebg, imgtoimg)
 
     elif rsp["function"] == "searchfile":
         file = Shared_vars.loadedfile[ip]

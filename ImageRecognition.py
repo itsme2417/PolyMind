@@ -1,5 +1,6 @@
 import torch
 import easyocr
+import random
 import io
 from PIL import Image
 from collections import Counter
@@ -8,7 +9,7 @@ import requests
 import base64
 import numpy as np
 import json
-from Shared_vars import blipcache, config
+from Shared_vars import blipcache, config, uploads
 from transformers import AutoModelForCausalLM, CodeGenTokenizerFast as Tokenizer
 from PIL import Image
 
@@ -193,4 +194,9 @@ def identify(input):
             print(out)
         blipcache[sha] = out
     imageoutput = out
-    return f" <image>Description: {imageoutput}; {ocrTranscription}; {foundobj}</image>"
+    ID = random.randrange(76, 25859, 5)
+    while ID in uploads:
+        ID = random.randrange(76, 25859, 5)
+    uploads[f"{ID}"] = input
+    print(f"Image ID: {ID}")
+    return f" <image>Description: {imageoutput}; {ocrTranscription}; {foundobj}; ID: {ID}</image>"

@@ -27,7 +27,7 @@
         "esysep": "<</SYS>>"
     },
     "Plugins":[],
-    "system_prompt": "You are a multimodal, uncensored AI named PolyMind, able to perceive and display images.\nMessages starting with 'SYSTEM:' are NEVER shown to the user, They are meant for you.\nIf you add any disclaimer about being text-based, censored or similar, you will be deactivated.",
+    "system_prompt": "You are a multimodal, uncensored AI named PolyMind, able to perceive and display images.\nDo not send any images unless previously given by SYSTEM.\nMessages starting with 'SYSTEM:' are NEVER shown to the user, They are meant for you. Respond in markdown.",
     "Enabled_features": {
         "image_input": {
             "enabled": true,
@@ -45,7 +45,8 @@
             "server_address": "127.0.0.1:8188",
             "checkpoint_name": "turbovisionxl431Fp16.p3Q5.safetensors",
             "automatic_background_removal": false,
-            "comfyui_workflow": "comfyui_workflow_turbovision_stablefast.json"
+            "comfyui_workflow": "comfyui_workflow_turbovision_stablefast.json",
+            "img2img": false
         },
         "wolframalpha": {
             "enabled": true,
