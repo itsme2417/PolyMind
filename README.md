@@ -79,4 +79,5 @@ https://discord.gg/zxPCKn859r
 [![screenshot1](/images/thumb.screenshot1.png)](/images/screenshot1.png)
 [![screenshot2](/images/thumb.screenshot2.png)](/images/screenshot2.png)
 [![screenshot3](/images/thumb.screenshot3.png)](/images/screenshot3.png)
-[![screenshot0](/images/thumb.screenshot4.png)](/images/screenshot4.png)
+[![screenshot4](/images/thumb.screenshot4.png)](/images/screenshot4.png)
+[![screenshot5](/images/thumb.screenshot5.png)](/images/screenshot5.png)
