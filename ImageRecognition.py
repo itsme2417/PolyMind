@@ -62,41 +62,6 @@ def llamacpp_img(raw_image):
             print(e)
     return content
 
-
-def get_position(bbox, width, height):  # Thanks mixtral, works pretty good
-    # Unpack bounding box coordinates
-    (x1, y1), (x2, y2), (x3, y3), (x4, y4) = bbox
-
-    def percentage(percent, whole):
-        return (percent * whole) / 100.0
-
-    # Calculate bounding box center
-    bbox_center_x = (x1 + x2 + x3 + x4) / 4
-    bbox_center_y = (y1 + y2 + y3 + y4) / 4
-
-    # Calculate center of the provided width and height
-    center_x = width / 2
-    center_y = height / 2
-
-    # Determine the relative position
-    if bbox_center_x < center_x and bbox_center_y < center_y:
-        return "top-left corner"
-    elif abs(bbox_center_x - center_x) < percentage(10, width):
-        return "center vertically"
-    elif abs(bbox_center_y - center_y) < percentage(10, height):
-        return "center horizontally"
-    elif bbox_center_x > center_x and bbox_center_y < center_y:
-        return "top-right corner"
-    elif bbox_center_x < center_x and bbox_center_y > center_y:
-        return "bottom-left corner"
-    elif bbox_center_x > center_x and bbox_center_y > center_y:
-        return "bottom-right corner"
-    elif bbox_center_x == center_x and bbox_center_y == center_y:
-        return "center"
-    else:
-        return "unknown position"
-
-
 def find_center(bounding_box):
     x_min, y_min = bounding_box[0][0], bounding_box[0][1]
     x_max, y_max = bounding_box[2][0], bounding_box[2][1]

@@ -69,7 +69,7 @@ if config.compat:
         print(
             "\033[91mERROR: Compatibility_mode is set to true but no tokenizer model is set, Exiting... \033[0m"
         )        
-    sys.exit()
+        sys.exit()
 if (
     config.enabled_features["wolframalpha"]["enabled"]
     and (config.enabled_features["wolframalpha"]["app_id"] == ""

@@ -54,7 +54,7 @@
         "params": {
             "prompt": "The prompt for stable diffusion to generate the image from. Remember to include the medium in the prompt, for example: photo, painting, sketch, drawing, etc.",
             "removebg":"lowercase bool, whether to generate a transparent image or not, should ALWAYS be false unless the user requests a transparent/ no background image in which case it should be true.",
-            "ID": "Always set to 0 if not specified by the user. Should only be used if the user requests img2img or an edit and there is a previously uploaded image in the context"
+            "ID": "Should only be used if the user requests img2img or an edit and there is a previously uploaded image in the context whose ID can be correlated, Always set to 0 otherwise."
        }
      },
      {
