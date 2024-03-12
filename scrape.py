@@ -53,7 +53,6 @@ def tokenize(input):
 
 def decode(input):
     if Shared_vars.config.compat:
-        print(input)
         decoded_text = tokenizer.decode(input, skip_special_tokens=True)
         return decoded_text
     else:
@@ -89,7 +88,16 @@ def shorten_text(text, max_tokens):
 
 def scrape_site(url, max_tokens):
     try:  # Thanks cybertimon for part of the script that finally made me implement scraping.
-        response = requests.get(url, timeout=3, impersonate="chrome110")
+        if "use_proxy" in Shared_vars.config.enabled_features['internetsearch']:
+            if Shared_vars.config.enabled_features['internetsearch']['use_proxy']:
+                proxies = {
+                    "https": Shared_vars.config.enabled_features['internetsearch']['proxy']
+                }
+                response = requests.get(url, timeout=3, impersonate="chrome110", proxies=proxies)
+            else:
+                response = requests.get(url, timeout=3, impersonate="chrome110")
+        else:
+            response = requests.get(url, timeout=3, impersonate="chrome110")
         content_type = response.headers.get('content-type')
         if url.endswith(".pdf") or 'application/pdf' in content_type:
             text = ""

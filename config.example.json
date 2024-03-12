@@ -57,7 +57,9 @@
             "depth": 3
         },
         "internetsearch": {
-            "enabled": true
+            "enabled": true,
+            "use_proxy": false,
+            "proxy": "socks5://ip:port"
         }
     }
   }
