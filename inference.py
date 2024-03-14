@@ -141,36 +141,38 @@ def infer(
     for line in request.iter_lines(decode_unicode=True):
         if line:
             if TABBY:
-                if " ".join(line.split(" ")[1:]) != "[DONE]":
-                    if (
-                        prevtoken
-                        == json.loads(" ".join(line.split(" ")[1:]))["choices"][0][
+                try:
+                    if " ".join(line.split(" ")[1:]) != "[DONE]":
+                        if (
+                            prevtoken
+                            == json.loads(" ".join(line.split(" ")[1:]))["choices"][0][
+                                "text"
+                            ]
+                        ):
+                            repetitioncount += 1
+                            if repetitioncount > 25:
+                                print("Stopping loop due to repetition")
+                                break
+                        else:
+                            repetitioncount = 0
+                        prevtoken = json.loads(" ".join(line.split(" ")[1:]))["choices"][0][
                             "text"
                         ]
-                    ):
-                        repetitioncount += 1
-                        if repetitioncount > 25:
-                            print("Stopping loop due to repetition")
-                            break
-                    else:
-                        repetitioncount = 0
-                    prevtoken = json.loads(" ".join(line.split(" ")[1:]))["choices"][0][
-                        "text"
-                    ]
-                    print(
-                        json.loads(" ".join(line.split(" ")[1:]))["choices"][0]["text"],
-                        end="",
-                        flush=True,
-                    )
-                    if streamresp:
-                        yield json.loads(" ".join(line.split(" ")[1:]))["choices"][0][
+                        print(
+                            json.loads(" ".join(line.split(" ")[1:]))["choices"][0]["text"],
+                            end="",
+                            flush=True,
+                        )
+                        if streamresp:
+                            yield json.loads(" ".join(line.split(" ")[1:]))["choices"][0][
+                                "text"
+                            ]
+
+                        content += json.loads(" ".join(line.split(" ")[1:]))["choices"][0][
                             "text"
                         ]
-
-                    content += json.loads(" ".join(line.split(" ")[1:]))["choices"][0][
-                        "text"
-                    ]
-
+                except Exception:
+                    pass
             else:
                 try:
                     if "data" in line:
