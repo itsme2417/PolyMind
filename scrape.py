@@ -93,7 +93,7 @@ def scrape_site(url, max_tokens):
                 proxies = {
                     "https": Shared_vars.config.enabled_features['internetsearch']['proxy']
                 }
-                response = requests.get(url, timeout=3, impersonate="chrome110", proxies=proxies)
+                response = requests.get(url, timeout=5, impersonate="chrome110", proxies=proxies)
             else:
                 response = requests.get(url, timeout=3, impersonate="chrome110")
         else:

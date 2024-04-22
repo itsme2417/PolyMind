@@ -7,7 +7,7 @@
     },
     {
         "name": "internetsearch",
-        "description": "This uses a search engine to research the topic. Only use when neccessary.",
+        "description": "This uses a search engine to research the topic. Only use when neccessary. Must never be used for translation related tasks.",
         "params": {
             "keywords": "A comma separated list of keywords to be passed to the search engine."
         }
