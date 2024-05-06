@@ -2,7 +2,7 @@
 
 beautifulsoup4==4.11.2
 curl-cffi==0.5.10
-duckduckgo-search==3.9.10
+duckduckgo-search==5.3.0
 easyocr==1.7.1
 fast-sentence-transformers[gpu]==0.4.1
 Flask==3.0.0

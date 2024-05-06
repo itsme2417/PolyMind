@@ -14,8 +14,8 @@ from transformers import AutoModelForCausalLM, CodeGenTokenizerFast as Tokenizer
 from PIL import Image
 
 if config.enabled_features["image_input"]["backend"] == "moondream":
-    model_id = "vikhyatk/moondream1"
-    model = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code=True)
+    model_id = "vikhyatk/moondream2"
+    model = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code=True, revision="2024-04-02")
     tokenizer = Tokenizer.from_pretrained(model_id)
 
 
@@ -155,7 +155,7 @@ def identify(input):
             print(out)
         else:
             enc_image = model.encode_image(raw_image)
-            out = model.answer_question(enc_image, "Write a short detailed caption including all important information:", tokenizer)
+            out = model.answer_question(enc_image, "Describe this image.", tokenizer)
             print(out)
         blipcache[sha] = out
     imageoutput = out
