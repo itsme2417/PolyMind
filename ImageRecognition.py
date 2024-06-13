@@ -107,6 +107,12 @@ def decode_img(msg):
     return img
 
 
+def find_midpoint(ymin, ymax, xmin, xmax):
+    middle_x = (xmax + xmin) / 2
+    middle_y = (ymax + ymin) / 2
+    return f'Position: {middle_x}, {middle_y}'
+
+
 def identify(input):
     imageoutput = ""
     ocrTranscription = ""
@@ -128,10 +134,11 @@ def identify(input):
     ocrTranscription = '"'
     yoloresults = yolo(np.array(raw_image))
     tempres = []
+    
     for x in json.loads(yoloresults.pandas().xyxy[0].to_json(orient="records")):
         if x["confidence"] > 0.4:
             print(f"Confidence: {x['confidence']}, {x['name']}")
-            tempres.append(x["name"])
+            tempres.append(f"{x['name']}, {find_midpoint(x['ymin'],x['ymax'],x['xmin'],x['xmax'])}")
     tempres = remove_duplicates(tempres)
     foundobjt = ",".join(tempres)
     if not foundobjt == "":
