@@ -109,8 +109,6 @@ def verifyFunc(result, x, input, stopstrings):
             .replace("<startfunc>", "")
             .replace("</", "")
             .replace("<", "")
-            .replace("False", "false")
-            .replace("True", "true")
         )
         print(f'Updated function call: {content}')
     except Exception as e:
@@ -187,8 +185,6 @@ def GateKeep(input, ip, depth=0, stream=False):
             .replace("<startfunc>", "")
             .replace("</", "")
             .replace("<", "")
-            .replace("False", "false")
-            .replace("True", "true")
         )
         print(content)
         result = ""
